@@ -1,4 +1,4 @@
-package se.fk.github.manuellregelratttillforsakring.presentation.kafka;
+package se.fk.github.bekraftabeslut.presentation.kafka;
 
 import io.quarkus.kafka.client.serialization.ObjectMapperDeserializer;
 import se.fk.rimfrost.OperativtUppgiftslagerStatusMessage;

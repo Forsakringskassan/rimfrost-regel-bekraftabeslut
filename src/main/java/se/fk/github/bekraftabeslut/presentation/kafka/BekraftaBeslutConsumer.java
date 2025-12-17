@@ -1,40 +1,37 @@
-package se.fk.github.manuellregelratttillforsakring.presentation.kafka;
+package se.fk.github.bekraftabeslut.presentation.kafka;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import se.fk.github.logging.callerinfo.model.MDCKeys;
-import se.fk.github.manuellregelratttillforsakring.logic.RtfService;
 import se.fk.rimfrost.OperativtUppgiftslagerResponseMessage;
 import se.fk.rimfrost.OperativtUppgiftslagerStatusMessage;
-import se.fk.rimfrost.regel.rtf.manuell.RtfManuellRequestMessagePayload;
+import se.fk.rimfrost.regel.bekraftabeslut.BekraftaBeslutRequestMessagePayload;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 @ApplicationScoped
-public class RtfManuellConsumer
+public class BekraftaBeslutConsumer
 {
 
-   private static final Logger LOGGER = LoggerFactory.getLogger(RtfManuellConsumer.class);
+   private static final Logger LOGGER = LoggerFactory.getLogger(BekraftaBeslutConsumer.class);
 
    @Inject
-   RtfService rtfService;
+   BekraftaBeslutService bekraftabeslutService;
 
-   @Inject
-   RtfManuellKafkaMapper mapper;
 
-   @Incoming("rtf-manuell-requests")
-   public void onRtfManuellRequest(RtfManuellRequestMessagePayload rtfRequest)
+   @Incoming("bekrafta-beslut-requests")
+   public void onBekraftaBeslutRequest(BekraftaBeslutRequestMessagePayload bekraftaBeslutRequest)
    {
-      MDC.put(MDCKeys.PROCESSID.name(), rtfRequest.getData().getKundbehovsflodeId());
+      MDC.put(MDCKeys.PROCESSID.name(), bekraftaBeslutRequest.getData().getKundbehovsflodeId());
       LOGGER.info(
-            "RtfManuellRequestMessagePayload received with KundbehovsflodeId: " + rtfRequest.getData().getKundbehovsflodeId());
+            "BekraftaBeslutRequestMessagePayload received with KundbehovsflodeId: " + bekraftaBeslutRequest.getData().getKundbehovsflodeId());
 
-      var request = mapper.toCreateRtfDataRequest(rtfRequest);
-      rtfService.createRtfData(request);
+      var request = mapper.toCreateRtfDataRequest(bekraftaBeslutRequest);
+      bekraftabeslutService.createRtfData(request);
    }
 
    @Incoming("operativt-uppgiftslager-responses")

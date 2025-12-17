@@ -34,9 +34,9 @@
       <version>0.0.0</version>
     </dependency>
     <dependency>
-      <groupId>se.fk.rimfrost</groupId>
+      <groupId>se.fk.rimfrost.regel.bekraftabeslut</groupId>
       <artifactId>rimfrost-regel-bekraftabeslut-asyncapi</artifactId>
-      <version>0.0.1</version>
+      <version>0.0.2</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost</groupId>
