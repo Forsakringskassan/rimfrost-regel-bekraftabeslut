@@ -5,12 +5,13 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import se.fk.github.bekraftabeslut.logic.dto.CreateBekraftaBeslutDataRequest;
 import se.fk.rimfrost.regel.bekraftabeslut.BekraftaBeslutRequestMessagePayload;
+import se.fk.github.bekraftabeslut.logic.dto.ImmutableCreateBekraftaBeslutDataRequest;
+ 
 
 @ApplicationScoped
 public class BekraftaBeslutKafkaMapper {
-   public CreateBekraftaBeslutDataRequest toCreateRtfDataRequest(BekraftaBeslutRequestMessagePayload bekraftaBeslutRequest)
+   public CreateBekraftaBeslutDataRequest toCreateBekraftaBeslutDataRequest(BekraftaBeslutRequestMessagePayload bekraftaBeslutRequest)
    {
-      
       return ImmutableCreateBekraftaBeslutDataRequest.builder()
             .id(UUID.fromString(bekraftaBeslutRequest.getId()))
             .kogitorootprociid(UUID.fromString(bekraftaBeslutRequest.getKogitorootprociid()))

@@ -43,6 +43,11 @@
       <artifactId>rimfrost-service-oul-asyncapi</artifactId>
       <version>0.3.3</version>
     </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost</groupId>
+      <artifactId>rimfrost-service-kundbehovsflode-openapi-jaxrs-spec</artifactId>
+      <version>1.2.0</version>
+    </dependency>
   </dependencies>
 
   <repositories>
