@@ -1,0 +1,119 @@
+package se.fk.github.bekraftabeslut.presentation.rest;
+
+import java.util.UUID;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
+import se.fk.github.bekraftabeslut.logic.dto.ImmutableUpdateErsattningDataRequest;
+import se.fk.github.bekraftabeslut.logic.dto.UpdateErsattningDataRequest;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Anstallning;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Ersattning;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Kund;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Lon;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Kund.KonEnum;
+
+@ApplicationScoped
+public class BekraftaBeslutRestMapper
+{
+
+   public GetDataResponse toGetDataResponse(GetBekraftaBeslutDataResponse bekraftaBeslutResponse)
+   {
+      var lon = new Lon();
+      lon.setFrom(bekraftaBeslutResponse.lonFrom());
+      lon.setTom(bekraftaBeslutResponse.lonTom());
+      lon.setLonesumma(bekraftaBeslutResponse.loneSumma());
+
+      var anstallning = new Anstallning();
+      anstallning.setAnstallningsdag(bekraftaBeslutResponse.anstallningsdag());
+      anstallning.setArbetstidProcent(bekraftaBeslutResponse.arbetstidProcent());
+      anstallning.setSistaAnstallningsdag(bekraftaBeslutResponse.sistaAnstallningsdag());
+      anstallning.setOrganisationsnamn(bekraftaBeslutResponse.organisationsnamn());
+      anstallning.setOrganisationsnummer(bekraftaBeslutResponse.organistaionsnummer());
+      anstallning.setLon(lon);
+
+      var kund = new Kund();
+      kund.setFornamn(bekraftaBeslutResponse.fornamn());
+      kund.setEfternamn(bekraftaBeslutResponse.efternamn());
+      kund.setAnstallning(anstallning);
+      kund.setKon(mapKonEnum(bekraftaBeslutResponse.kon()));
+
+      var response = new GetDataResponse();
+      response.setKund(kund);
+      response.kundbehovsflodeId(bekraftaBeslutResponse.kundbehovsflodeId());
+      for (var bekraftaBeslutErsattning : bekraftaBeslutResponse.ersattning())
+      {
+         var ersattning = new Ersattning();
+         ersattning.setBelopp(bekraftaBeslutErsattning.belopp());
+         ersattning.setBerakningsgrund(bekraftaBeslutErsattning.berakningsgrund());
+         ersattning.setErsattningId(bekraftaBeslutErsattning.ersattningsId());
+         ersattning.setErsattningstyp(bekraftaBeslutErsattning.ersattningsTyp());
+         ersattning.setOmfattningProcent(bekraftaBeslutErsattning.omfattningsProcent());
+         ersattning.setFrom(bekraftaBeslutErsattning.from());
+         ersattning.setTom(bekraftaBeslutErsattning.tom());
+         ersattning.setAvslagsanledning(bekraftaBeslutErsattning.avslagsanledning());
+         if (bekraftaBeslutErsattning.beslutsutfall() != null)
+         {
+            ersattning.setBeslutsutfall(mapBeslutsutfall(bekraftaBeslutErsattning.beslutsutfall()));
+         }
+         response.addErsattningItem(ersattning);
+      }
+      return response;
+   }
+
+   public UpdateErsattningDataRequest toUpdateErsattningDataRequest(UUID kundbehovsflodeId, PatchDataRequest patchRequest)
+   {
+      return ImmutableUpdateErsattningDataRequest.builder()
+            .kundbehovsflodeId(kundbehovsflodeId)
+            .beslutsutfall(mapBeslutsutfall(patchRequest.getBeslutsutfall()))
+            .ersattningId(patchRequest.getErsattningId())
+            .avslagsanledning(patchRequest.getAvslagsanledning())
+            .signernad(patchRequest.getSignera())
+            .build();
+   }
+
+   private Beslutsutfall mapBeslutsutfall(se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall beslututfall)
+   {
+      switch (beslututfall)
+      {
+         case JA:
+            return Beslutsutfall.JA;
+         case NEJ:
+            return Beslutsutfall.NEJ;
+         case FU:
+            return Beslutsutfall.FU;
+         default:
+            return null;
+      }
+   }
+
+   private se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall mapBeslutsutfall(Beslutsutfall beslututfall)
+   {
+      switch (beslututfall)
+      {
+         case JA:
+            return se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.JA;
+         case NEJ:
+            return se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.NEJ;
+         case FU:
+            return se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.FU;
+         default:
+            return null;
+      }
+   }
+
+   private KonEnum mapKonEnum(String kon)
+   {
+      switch (kon)
+      {
+         case "Man":
+            return KonEnum.MAN;
+         default:
+         case "KVINNA":
+            return KonEnum.KVINNA;
+      }
+   }
+
+}

@@ -3,8 +3,8 @@ package se.fk.github.bekraftabeslut.integration.kafka;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
@@ -39,11 +39,11 @@ public class BekraftaBeslutKafkaProducer
    @OnOverflow(value = OnOverflow.Strategy.BUFFER, bufferSize = 1024)
    Emitter<BekraftaBeslutResponseMessagePayload> bekraftaBeslutResponseEmitter;
 
-   // private static final Logger LOGGER = LoggerFactory.getLogger(BekraftaBeslutKafkaProducer.class); #ANVÄNDA SEN??
+   private static final Logger LOGGER = LoggerFactory.getLogger(BekraftaBeslutKafkaProducer.class); //ANVÄNDA SEN??
    public void sendOulRequest(UUID kundbehovsflodeId)
    {
       var request = new OperativtUppgiftslagerRequestMessage();
-      request.setRegeltyp("bekraftabeslut-manuell");
+      request.setRegeltyp("bekraftabeslut");
       request.setKundbehovsflodeId(kundbehovsflodeId.toString());
       oulRequestEmitter.send(request);
    }
