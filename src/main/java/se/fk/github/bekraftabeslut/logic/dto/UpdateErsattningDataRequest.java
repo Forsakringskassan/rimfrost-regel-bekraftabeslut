@@ -16,6 +16,6 @@ public interface UpdateErsattningDataRequest
 
    String avslagsanledning();
 
-   boolean signernad();
+   boolean signerad();
 
 }

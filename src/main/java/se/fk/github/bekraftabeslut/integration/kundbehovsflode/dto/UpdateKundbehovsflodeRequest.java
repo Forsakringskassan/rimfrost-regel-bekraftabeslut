@@ -17,4 +17,6 @@ public interface UpdateKundbehovsflodeRequest
 
    List<UpdateKundbehovsflodeErsattning> ersattningar();
 
+   List<UpdateKundbehovsflodeUnderlag> underlag();
+
 }

@@ -18,6 +18,8 @@ public interface BekraftaBeslutData
    @Nullable
    UUID uppgiftId();
 
-   List<ErsattningData> ersattningar();
+   List<se.fk.github.bekraftabeslut.logic.entity.ErsattningData> ersattningar();
+
+   List<se.fk.github.bekraftabeslut.logic.entity.Underlag> underlag();
 
 }

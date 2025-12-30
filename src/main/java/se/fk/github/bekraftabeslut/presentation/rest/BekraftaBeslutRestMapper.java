@@ -31,7 +31,7 @@ public class BekraftaBeslutRestMapper
       anstallning.setArbetstidProcent(bekraftaBeslutResponse.arbetstidProcent());
       anstallning.setSistaAnstallningsdag(bekraftaBeslutResponse.sistaAnstallningsdag());
       anstallning.setOrganisationsnamn(bekraftaBeslutResponse.organisationsnamn());
-      anstallning.setOrganisationsnummer(bekraftaBeslutResponse.organistaionsnummer());
+      anstallning.setOrganisationsnummer(bekraftaBeslutResponse.organisationsnummer());
       anstallning.setLon(lon);
 
       var kund = new Kund();
@@ -70,7 +70,7 @@ public class BekraftaBeslutRestMapper
             .beslutsutfall(mapBeslutsutfall(patchRequest.getBeslutsutfall()))
             .ersattningId(patchRequest.getErsattningId())
             .avslagsanledning(patchRequest.getAvslagsanledning())
-            .signernad(patchRequest.getSignera())
+            .signerad(patchRequest.getSignera())
             .build();
    }
 

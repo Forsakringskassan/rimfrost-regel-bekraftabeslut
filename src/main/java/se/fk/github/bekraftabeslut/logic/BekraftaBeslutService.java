@@ -5,11 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import se.fk.github.bekraftabeslut.integration.arbetsgivare.ArbetsgivareAdapter;
+import se.fk.github.bekraftabeslut.integration.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.github.bekraftabeslut.integration.arbetsgivare.dto.ImmutableArbetsgivareRequest;
 import se.fk.github.bekraftabeslut.integration.folkbokford.FolkbokfordAdapter;
+import se.fk.github.bekraftabeslut.integration.folkbokford.dto.FolkbokfordResponse;
 import se.fk.github.bekraftabeslut.integration.folkbokford.dto.ImmutableFolkbokfordRequest;
 import se.fk.github.bekraftabeslut.integration.kafka.BekraftaBeslutKafkaProducer;
 import se.fk.github.bekraftabeslut.integration.kundbehovsflode.KundbehovsflodeAdapter;
@@ -18,6 +23,7 @@ import se.fk.github.bekraftabeslut.logic.entity.CloudEventData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableCloudEventData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableErsattningData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableBekraftaBeslutData;
+import se.fk.github.bekraftabeslut.logic.entity.ImmutableUnderlag;
 import se.fk.github.bekraftabeslut.logic.entity.BekraftaBeslutData;
 import se.fk.rimfrost.Status;
 import se.fk.github.bekraftabeslut.logic.entity.ErsattningData;
@@ -32,6 +38,9 @@ import se.fk.github.bekraftabeslut.logic.dto.UpdateStatusRequest;
 @ApplicationScoped
 public class BekraftaBeslutService
 {
+
+   @Inject
+   ObjectMapper objectMapper;
 
    @Inject
    BekraftaBeslutKafkaProducer kafkaProducer;
@@ -51,7 +60,7 @@ public class BekraftaBeslutService
    Map<UUID, CloudEventData> cloudevents = new HashMap<UUID, CloudEventData>();
    Map<UUID, BekraftaBeslutData> bekraftaBeslutDatas = new HashMap<UUID, BekraftaBeslutData>();
 
-   public GetBekraftaBeslutDataResponse getData(GetBekraftaBeslutDataRequest request)
+   public GetBekraftaBeslutDataResponse getData(GetBekraftaBeslutDataRequest request) throws JsonProcessingException
    {
       var kundbehovsflodeRequest = ImmutableKundbehovsflodeRequest.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
@@ -70,8 +79,9 @@ public class BekraftaBeslutService
 
       var bekraftaBeslutData = bekraftaBeslutDatas.get(request.kundbehovsflodeId());
 
-      updateKundbehovsflodeInfo(bekraftaBeslutData);
+      updateBekraftaBeslutDataUnderlag(bekraftaBeslutData, folkbokfordResponse, arbetsgivareResponse);
 
+      updateKundbehovsflodeInfo(bekraftaBeslutData); 
       return mapper.toBekraftaBeslutResponse(kundbehovflodesResponse, folkbokfordResponse, arbetsgivareResponse, bekraftaBeslutData);
    }
 
@@ -105,8 +115,10 @@ public class BekraftaBeslutService
 
       var bekraftaBeslutData = ImmutableBekraftaBeslutData.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
+            .uppgiftId(UUID.randomUUID())
             .cloudeventId(cloudeventData.id())
             .ersattningar(ersattninglist)
+            .underlag(new ArrayList<>())
             .build();
 
       cloudevents.put(cloudeventData.id(), cloudeventData);
@@ -154,7 +166,7 @@ public class BekraftaBeslutService
 
       updateKundbehovsflodeInfo(updatedBekraftaBeslutData);
 
-      if (updateRequest.signernad())
+      if (updateRequest.signerad())
       {
          var rattTillForsakring = updatedList.stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA);
          var cloudevent = cloudevents.get(updatedBekraftaBeslutData.cloudeventId());
@@ -172,6 +184,34 @@ public class BekraftaBeslutService
             .findFirst()
             .orElse(bekraftaBeslutDatas.get(request.kundbehovsflodeId()));
       updateKundbehovsflodeInfo(bekraftaBeslutData);
+   }
+
+   private void updateBekraftaBeslutDataUnderlag(BekraftaBeslutData bekraftaBeslutData, FolkbokfordResponse folkbokfordResponse,
+         ArbetsgivareResponse arbetsgivareResponse) throws JsonProcessingException
+   {
+      var bekraftaBeslutDataBuilder = ImmutableBekraftaBeslutData.builder().from(bekraftaBeslutData);
+
+      if (folkbokfordResponse != null)
+      {
+         var folkbokfordUnderlag = ImmutableUnderlag.builder()
+               .typ("FolkbokfördUnderlag")
+               .version("1.0")
+               .data(objectMapper.writeValueAsString(folkbokfordResponse))
+               .build();
+         bekraftaBeslutDataBuilder.addUnderlag(folkbokfordUnderlag);
+      }
+
+      if (arbetsgivareResponse != null)
+      {
+         var arbetsgivareUnderlag = ImmutableUnderlag.builder()
+               .typ("ArbetsgivareUnderlag")
+               .version("1.0")
+               .data(objectMapper.writeValueAsString(arbetsgivareResponse))
+               .build();
+         bekraftaBeslutDataBuilder.addUnderlag(arbetsgivareUnderlag);
+      }
+
+      bekraftaBeslutDatas.put(bekraftaBeslutData.kundbehovsflodeId(), bekraftaBeslutDataBuilder.build());
    }
 
    private void updateKundbehovsflodeInfo(BekraftaBeslutData bekraftaBeslutData)

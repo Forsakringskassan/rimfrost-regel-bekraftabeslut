@@ -20,7 +20,7 @@ public interface GetBekraftaBeslutDataResponse
 
    String kon();
 
-   String organistaionsnummer();
+   String organisationsnummer();
 
    String organisationsnamn();
 
