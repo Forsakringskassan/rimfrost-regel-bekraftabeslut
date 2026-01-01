@@ -1,2 +1,2 @@
-# rimfrost-regel-registreraavslag
-För att registrera avslag eller bekräfta beslut på ersättningar.
+# rimfrost-regel-bekraftabeslut
+För att bekräfta beslut på ersättningar.
