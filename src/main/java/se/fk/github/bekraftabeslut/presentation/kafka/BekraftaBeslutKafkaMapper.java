@@ -18,7 +18,8 @@ import se.fk.rimfrost.regel.bekraftabeslut.BekraftaBeslutRequestMessagePayload;
 @ApplicationScoped
 public class BekraftaBeslutKafkaMapper
 {
-   public CreateBekraftaBeslutDataRequest toCreateBekraftaBeslutDataRequest(BekraftaBeslutRequestMessagePayload BekraftaBeslutRequest)
+   public CreateBekraftaBeslutDataRequest toCreateBekraftaBeslutDataRequest(
+         BekraftaBeslutRequestMessagePayload BekraftaBeslutRequest)
    {
       return ImmutableCreateBekraftaBeslutDataRequest.builder()
             .id(UUID.fromString(BekraftaBeslutRequest.getId()))

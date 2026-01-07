@@ -27,7 +27,8 @@ public class BekraftaBeslutMapper
 {
 
    public GetBekraftaBeslutDataResponse toBekraftaBeslutResponse(KundbehovsflodeResponse kundbehovflodesResponse,
-         FolkbokfordResponse folkbokfordResponse, ArbetsgivareResponse arbetsgivareResponse, BekraftaBeslutData bekraftaBeslutData)
+         FolkbokfordResponse folkbokfordResponse, ArbetsgivareResponse arbetsgivareResponse,
+         BekraftaBeslutData bekraftaBeslutData)
    {
       var ersattningsList = new ArrayList<Ersattning>();
 
@@ -83,7 +84,8 @@ public class BekraftaBeslutMapper
       return builder.build();
    }
 
-   public BekraftaBeslutResponseRequest toBekraftaBeslutResponseRequest(BekraftaBeslutData bekraftaBeslutData, CloudEventData cloudevent, boolean rattTillForsakring)
+   public BekraftaBeslutResponseRequest toBekraftaBeslutResponseRequest(BekraftaBeslutData bekraftaBeslutData,
+         CloudEventData cloudevent, boolean rattTillForsakring)
    {
       return ImmutableBekraftaBeslutResponseRequest.builder()
             .id(cloudevent.id())

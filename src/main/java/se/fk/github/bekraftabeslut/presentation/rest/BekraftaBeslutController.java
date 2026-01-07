@@ -23,7 +23,8 @@ import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generat
 
 @ApplicationScoped
 @Path("/regel/bekrafta-beslut/{kundbehovsflodeId}")
-public class BekraftaBeslutController implements RegelBekraftaBeslutControllerApi {
+public class BekraftaBeslutController implements RegelBekraftaBeslutControllerApi
+{
 
    private static final Logger LOGGER = LoggerFactory.getLogger(BekraftaBeslutController.class);
 
@@ -35,20 +36,25 @@ public class BekraftaBeslutController implements RegelBekraftaBeslutControllerAp
 
    @GET
    @Override
-   public GetDataResponse getData(UUID kundbehovsflodeId) {
-      try {
+   public GetDataResponse getData(UUID kundbehovsflodeId)
+   {
+      try
+      {
          var request = ImmutableGetBekraftaBeslutDataRequest.builder()
                .kundbehovsflodeId(kundbehovsflodeId).build();
          var response = bekraftaBeslutService.getData(request);
          return mapper.toGetDataResponse(response);
-      } catch (JsonProcessingException e) {
+      }
+      catch (JsonProcessingException e)
+      {
          throw new InternalServerErrorException("Failed to process request");
       }
    }
 
    @PATCH
    @Override
-   public void updateData(UUID kundbehovsflodeId, @Valid @NotNull PatchDataRequest patchRequest) {
+   public void updateData(UUID kundbehovsflodeId, @Valid @NotNull PatchDataRequest patchRequest)
+   {
       LOGGER.info(
             "updateData received with patchrequest: " + patchRequest);
       var request = mapper.toUpdateErsattningDataRequest(kundbehovsflodeId, patchRequest);

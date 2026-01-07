@@ -81,8 +81,9 @@ public class BekraftaBeslutService
 
       updateBekraftaBeslutDataUnderlag(bekraftaBeslutData, folkbokfordResponse, arbetsgivareResponse);
 
-      updateKundbehovsflodeInfo(bekraftaBeslutData); 
-      return mapper.toBekraftaBeslutResponse(kundbehovflodesResponse, folkbokfordResponse, arbetsgivareResponse, bekraftaBeslutData);
+      updateKundbehovsflodeInfo(bekraftaBeslutData);
+      return mapper.toBekraftaBeslutResponse(kundbehovflodesResponse, folkbokfordResponse, arbetsgivareResponse,
+            bekraftaBeslutData);
    }
 
    public void createBekraftaBeslutData(CreateBekraftaBeslutDataRequest request)
@@ -170,7 +171,8 @@ public class BekraftaBeslutService
       {
          var rattTillForsakring = updatedList.stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA);
          var cloudevent = cloudevents.get(updatedBekraftaBeslutData.cloudeventId());
-         var bekraftaBeslutResponse = mapper.toBekraftaBeslutResponseRequest(updatedBekraftaBeslutData, cloudevent, rattTillForsakring);
+         var bekraftaBeslutResponse = mapper.toBekraftaBeslutResponseRequest(updatedBekraftaBeslutData, cloudevent,
+               rattTillForsakring);
          kafkaProducer.sendOulStatusUpdate(updatedBekraftaBeslutData.uppgiftId(), Status.AVSLUTAD);
          kafkaProducer.sendBekraftaBeslutResponse(bekraftaBeslutResponse);
       }

@@ -40,6 +40,7 @@ public class BekraftaBeslutKafkaProducer
    Emitter<BekraftaBeslutResponseMessagePayload> bekraftaBeslutResponseEmitter;
 
    private static final Logger LOGGER = LoggerFactory.getLogger(BekraftaBeslutKafkaProducer.class); //ANVÄNDA SEN??
+
    public void sendOulRequest(UUID kundbehovsflodeId)
    {
       var request = new OperativtUppgiftslagerRequestMessage();

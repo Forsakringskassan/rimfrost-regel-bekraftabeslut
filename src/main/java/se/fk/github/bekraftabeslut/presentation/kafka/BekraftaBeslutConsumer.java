@@ -33,7 +33,8 @@ public class BekraftaBeslutConsumer
    {
       MDC.put(MDCKeys.PROCESSID.name(), bekraftaBeslutRequest.getData().getKundbehovsflodeId());
       LOGGER.info(
-            "BekraftaBeslutRequestMessagePayload received with KundbehovsflodeId: " + bekraftaBeslutRequest.getData().getKundbehovsflodeId());
+            "BekraftaBeslutRequestMessagePayload received with KundbehovsflodeId: "
+                  + bekraftaBeslutRequest.getData().getKundbehovsflodeId());
 
       var request = mapper.toCreateBekraftaBeslutDataRequest(bekraftaBeslutRequest);
       bekraftaBeslutService.createBekraftaBeslutData(request);

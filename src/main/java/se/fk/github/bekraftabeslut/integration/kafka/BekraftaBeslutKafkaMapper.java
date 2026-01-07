@@ -14,8 +14,8 @@ public class BekraftaBeslutKafkaMapper
    public BekraftaBeslutResponseMessagePayload toBekraftaBeslutResponse(BekraftaBeslutResponseRequest request)
    {
       var data = new BekraftaBeslutResponseMessageData();
-       data.setKundbehovsflodeId(request.kundbehovsflodeId().toString());
-       data.setRattTillForsakring(request.rattTillForsakring() ? RattTillForsakring.JA : RattTillForsakring.NEJ); //DISKUTERA MED ULF
+      data.setKundbehovsflodeId(request.kundbehovsflodeId().toString());
+      data.setRattTillForsakring(request.rattTillForsakring() ? RattTillForsakring.JA : RattTillForsakring.NEJ); //DISKUTERA MED ULF
 
       var response = new BekraftaBeslutResponseMessagePayload();
       response.setId(request.id().toString());
