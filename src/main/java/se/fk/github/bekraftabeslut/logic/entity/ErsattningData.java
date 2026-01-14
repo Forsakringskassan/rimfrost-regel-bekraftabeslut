@@ -1,9 +1,7 @@
 package se.fk.github.bekraftabeslut.logic.entity;
 
 import java.util.UUID;
-
 import org.immutables.value.Value;
-
 import jakarta.annotation.Nullable;
 import se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall;
 

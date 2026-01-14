@@ -1,0 +1,30 @@
+uppgift:
+  version: 1.0
+  path: /regel/bekraftabeslut
+  aktivitet: "Bekräfta beslut"
+
+specifikation:
+  id: a42ffaed-2f20-47e8-8499-f2f79ae2f45e
+  version: 1.0
+  namn: "Bekräfta beslut"
+  uppgiftbeskrivning: "Bekräfta beslut"
+  verksamhetslogik: B
+  roll: ANSVARIG_HANDLAGGARE
+  applikationsId: 3.5.1
+  applikationsversion: bekrafta_beslut_1.0
+
+regel:
+  id: a11f3429-3a6b-4389-ba1c-c2747b0fb45a
+  version: 1.0
+  namn: "Bekräfta beslut"
+  beskrivning: "Bekräfta beslut"
+
+lagrum:
+  id: f0c927a9-b995-4a12-b4fd-4bcbf4281b43
+  version: 1.0
+  giltigFom: 2010-02-11
+  forfattning: "Husdjursbalken"
+  kapitel: 3
+  paragraf: 5
+  stycke: 1
+  punkt: 4
