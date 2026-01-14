@@ -56,7 +56,7 @@ public class KundbehovsflodeMapper
       uppgift.setSkapadTs(OffsetDateTime.now());
       uppgift.setUtfordTs(OffsetDateTime.now());
       uppgift.setUppgiftStatus(UppgiftStatus.AVSLUTAD);
-      uppgift.setUtforarId(UUID.randomUUID());//TODO bör komma från OUL
+      uppgift.setUtforarId(UUID.randomUUID());
       uppgift.setVersion("1.0");
 
       var uppgiftspecifikation = new Uppgiftspecifikation();

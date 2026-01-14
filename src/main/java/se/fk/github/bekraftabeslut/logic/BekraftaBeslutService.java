@@ -4,21 +4,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import io.quarkus.runtime.Startup;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import se.fk.github.bekraftabeslut.integration.arbetsgivare.ArbetsgivareAdapter;
 import se.fk.github.bekraftabeslut.integration.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.github.bekraftabeslut.integration.arbetsgivare.dto.ImmutableArbetsgivareRequest;
+import se.fk.github.bekraftabeslut.integration.config.RegelConfigProvider;
 import se.fk.github.bekraftabeslut.integration.folkbokford.FolkbokfordAdapter;
 import se.fk.github.bekraftabeslut.integration.folkbokford.dto.FolkbokfordResponse;
 import se.fk.github.bekraftabeslut.integration.folkbokford.dto.ImmutableFolkbokfordRequest;
 import se.fk.github.bekraftabeslut.integration.kafka.BekraftaBeslutKafkaProducer;
+import se.fk.github.bekraftabeslut.integration.kafka.dto.ImmutableOulMessageRequest;
 import se.fk.github.bekraftabeslut.integration.kundbehovsflode.KundbehovsflodeAdapter;
 import se.fk.github.bekraftabeslut.integration.kundbehovsflode.dto.ImmutableKundbehovsflodeRequest;
+import se.fk.github.bekraftabeslut.logic.config.RegelConfig;
 import se.fk.github.bekraftabeslut.logic.entity.CloudEventData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableCloudEventData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableErsattningData;
@@ -33,11 +36,16 @@ import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataRequest;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.UpdateErsattningDataRequest;
 import se.fk.github.bekraftabeslut.logic.dto.UpdateBekraftaBeslutDataRequest;
-import se.fk.github.bekraftabeslut.logic.dto.UpdateStatusRequest;
+
+import se.fk.github.bekraftabeslut.logic.dto.UpdateStatusRequest; 
 
 @ApplicationScoped
+@Startup
 public class BekraftaBeslutService
 {
+
+   @Inject
+   RegelConfigProvider regelConfigProvider;
 
    @Inject
    ObjectMapper objectMapper;
@@ -47,7 +55,6 @@ public class BekraftaBeslutService
 
    @Inject
    BekraftaBeslutMapper mapper;
-
    @Inject
    FolkbokfordAdapter folkbokfordAdapter;
 
@@ -57,8 +64,17 @@ public class BekraftaBeslutService
    @Inject
    KundbehovsflodeAdapter kundbehovsflodeAdapter;
 
+   private RegelConfig regelConfig;
+
    Map<UUID, CloudEventData> cloudevents = new HashMap<UUID, CloudEventData>();
    Map<UUID, BekraftaBeslutData> bekraftaBeslutDatas = new HashMap<UUID, BekraftaBeslutData>();
+
+   @SuppressWarnings("unused")
+   @PostConstruct
+   void init()
+   {
+      this.regelConfig = regelConfigProvider.getConfig();
+   }
 
    public GetBekraftaBeslutDataResponse getData(GetBekraftaBeslutDataRequest request) throws JsonProcessingException
    {
@@ -66,12 +82,10 @@ public class BekraftaBeslutService
             .kundbehovsflodeId(request.kundbehovsflodeId())
             .build();
       var kundbehovflodesResponse = kundbehovsflodeAdapter.getKundbehovsflodeInfo(kundbehovsflodeRequest);
-
       var folkbokfordRequest = ImmutableFolkbokfordRequest.builder()
             .personnummer(kundbehovflodesResponse.personnummer())
             .build();
       var folkbokfordResponse = folkbokfordAdapter.getFolkbokfordInfo(folkbokfordRequest);
-
       var arbetsgivareRequest = ImmutableArbetsgivareRequest.builder()
             .personnummer(kundbehovflodesResponse.personnummer())
             .build();
@@ -82,8 +96,8 @@ public class BekraftaBeslutService
       updateBekraftaBeslutDataUnderlag(bekraftaBeslutData, folkbokfordResponse, arbetsgivareResponse);
 
       updateKundbehovsflodeInfo(bekraftaBeslutData);
-      return mapper.toBekraftaBeslutResponse(kundbehovflodesResponse, folkbokfordResponse, arbetsgivareResponse,
-            bekraftaBeslutData);
+
+      return mapper.toBekraftaBeslutResponse(kundbehovflodesResponse, folkbokfordResponse, arbetsgivareResponse, bekraftaBeslutData);
    }
 
    public void createBekraftaBeslutData(CreateBekraftaBeslutDataRequest request)
@@ -124,9 +138,18 @@ public class BekraftaBeslutService
 
       cloudevents.put(cloudeventData.id(), cloudeventData);
       bekraftaBeslutDatas.put(bekraftaBeslutData.kundbehovsflodeId(), bekraftaBeslutData);
-
-      kafkaProducer.sendOulRequest(request.kundbehovsflodeId());
+      var oulMessageRequest = ImmutableOulMessageRequest.builder()
+            .kundbehovsflodeId(request.kundbehovsflodeId())
+            .kundbehov("Vård av husdjur")
+            .regel(regelConfig.getUppgift().getNamn())
+            .beskrivning(regelConfig.getUppgift().getBeskrivning())
+            .verksamhetslogik(regelConfig.getUppgift().getVerksamhetslogik())
+            .roll(regelConfig.getUppgift().getRoll())
+            .url("http://localhost:8888" + regelConfig.getUppgift().getPath() + "/" + request.kundbehovsflodeId().toString())
+            .build();
+      kafkaProducer.sendOulRequest(oulMessageRequest);
    }
+
 
    public void updateBekraftaBeslutData(UpdateBekraftaBeslutDataRequest updateRequest)
    {
@@ -171,8 +194,7 @@ public class BekraftaBeslutService
       {
          var rattTillForsakring = updatedList.stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA);
          var cloudevent = cloudevents.get(updatedBekraftaBeslutData.cloudeventId());
-         var bekraftaBeslutResponse = mapper.toBekraftaBeslutResponseRequest(updatedBekraftaBeslutData, cloudevent,
-               rattTillForsakring);
+         var bekraftaBeslutResponse = mapper.toBekraftaBeslutResponseRequest(updatedBekraftaBeslutData, cloudevent, rattTillForsakring);
          kafkaProducer.sendOulStatusUpdate(updatedBekraftaBeslutData.uppgiftId(), Status.AVSLUTAD);
          kafkaProducer.sendBekraftaBeslutResponse(bekraftaBeslutResponse);
       }

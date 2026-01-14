@@ -11,11 +11,12 @@ import se.fk.rimfrost.regel.bekraftabeslut.SpecVersion;
 @ApplicationScoped
 public class BekraftaBeslutKafkaMapper
 {
+
    public BekraftaBeslutResponseMessagePayload toBekraftaBeslutResponse(BekraftaBeslutResponseRequest request)
    {
       var data = new BekraftaBeslutResponseMessageData();
       data.setKundbehovsflodeId(request.kundbehovsflodeId().toString());
-      data.setRattTillForsakring(request.rattTillForsakring() ? RattTillForsakring.JA : RattTillForsakring.NEJ); //DISKUTERA MED ULF
+      data.setRattTillForsakring(request.rattTillForsakring() ? RattTillForsakring.JA : RattTillForsakring.NEJ);
 
       var response = new BekraftaBeslutResponseMessagePayload();
       response.setId(request.id().toString());
@@ -28,8 +29,8 @@ public class BekraftaBeslutKafkaMapper
       response.setKogitoprocist(request.kogitoprocist());
       response.setKogitoprocversion(request.kogitoprocversion());
       response.setSpecversion(SpecVersion.NUMBER_1_DOT_0);
-      response.setSource("/regel/bekrafta-beslut");
-      response.setType("bekrafta-beslut-responses");
+      response.setSource("/regel/bekraftabeslut");
+      response.setType("bekraftabeslut-responses");
       response.setKogitoproctype(KogitoProcType.BPMN);
       response.setData(data);
 

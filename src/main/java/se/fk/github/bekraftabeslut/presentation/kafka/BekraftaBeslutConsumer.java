@@ -8,8 +8,6 @@ import se.fk.github.bekraftabeslut.logic.BekraftaBeslutService;
 import se.fk.github.logging.callerinfo.model.MDCKeys;
 import se.fk.rimfrost.OperativtUppgiftslagerResponseMessage;
 import se.fk.rimfrost.OperativtUppgiftslagerStatusMessage;
-import se.fk.rimfrost.OperativtUppgiftslagerResponseMessage;
-import se.fk.rimfrost.OperativtUppgiftslagerStatusMessage;
 import se.fk.rimfrost.regel.bekraftabeslut.BekraftaBeslutRequestMessagePayload;
 
 import org.slf4j.Logger;
