@@ -1,0 +1,6 @@
+uppgift:
+  namn: Bekräfta beslut
+  beskrivning: Bekräfta beslut
+  verksamhetslogik: B
+  roll: systemet
+  path: /regel/bekraftabeslut
