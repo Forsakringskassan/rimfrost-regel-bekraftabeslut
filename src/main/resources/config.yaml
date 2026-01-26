@@ -1,0 +1,6 @@
+uppgift:
+  namn: Är kunden husdjurets ägare?
+  beskrivning: Kontrollera om kunden äger husdjuret
+  verksamhetslogik: B
+  roll: systemet
+  path: /regel/bekraftabeslut

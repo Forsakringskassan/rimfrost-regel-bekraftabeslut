@@ -24,6 +24,10 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-health</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>
       <scope>test</scope>
     </dependency>
@@ -72,6 +76,11 @@
       <version>0.0.2</version>
     </dependency>
     <dependency>
+      <groupId>se.fk.rimfrost.regel.common</groupId>
+      <artifactId>rimfrost-regel-common-asyncapi</artifactId>
+      <version>0.1.1</version>
+    </dependency>
+    <dependency>
       <groupId>se.fk.rimfrost.regel.bekraftabeslut.openapi</groupId>
       <artifactId>rimfrost-regel-bekraftabeslut-openapi-jaxrs-spec</artifactId>
       <version>0.0.0</version>
@@ -90,6 +99,11 @@
       <groupId>se.fk.rimfrost</groupId>
       <artifactId>rimfrost-service-kundbehovsflode-openapi-jaxrs-spec</artifactId>
       <version>1.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.common</groupId>
+      <artifactId>rimfrost-common</artifactId>
+      <version>0.0.5</version>
     </dependency>
   </dependencies>
 
