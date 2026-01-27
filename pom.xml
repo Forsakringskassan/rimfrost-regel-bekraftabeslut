@@ -7,16 +7,17 @@
     <artifactId>fk-maven-quarkus-parent</artifactId>
     <version>1.11.1</version>
   </parent>
-
   <groupId>se.fk.rimfrost</groupId>
   <artifactId>rimfrost-regel-bekraftabeslut</artifactId>
   <version>1.0.1-SNAPSHOT</version>
-
+  <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-health</artifactId>
+  </dependency>
   <properties>
     <violations.maxViolations>0</violations.maxViolations>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
