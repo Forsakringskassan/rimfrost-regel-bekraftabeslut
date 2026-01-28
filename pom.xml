@@ -10,10 +10,6 @@
   <groupId>se.fk.rimfrost</groupId>
   <artifactId>rimfrost-regel-bekraftabeslut</artifactId>
   <version>1.0.1-SNAPSHOT</version>
-  <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-smallrye-health</artifactId>
-  </dependency>
   <properties>
     <violations.maxViolations>0</violations.maxViolations>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
@@ -79,7 +75,17 @@
     <dependency>
       <groupId>se.fk.rimfrost.regel.common</groupId>
       <artifactId>rimfrost-regel-common-asyncapi</artifactId>
-      <version>0.1.1</version>
+      <version>0.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.regel.common</groupId>
+      <artifactId>rimfrost-regel-common-openapi</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.regel.common</groupId>
+      <artifactId>rimfrost-regel-common-openapi-jaxrs-spec</artifactId>
+      <version>0.1.0</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.regel.bekraftabeslut.openapi</groupId>
@@ -99,12 +105,17 @@
     <dependency>
       <groupId>se.fk.rimfrost</groupId>
       <artifactId>rimfrost-service-kundbehovsflode-openapi-jaxrs-spec</artifactId>
-      <version>1.3.2</version>
+      <version>1.3.5</version>
     </dependency>
     <dependency>
-      <groupId>se.fk.rimfrost.common</groupId>
-      <artifactId>rimfrost-common</artifactId>
-      <version>0.0.5</version>
+      <groupId>se.fk.rimfrost.framework</groupId>
+      <artifactId>rimfrost-framework-oul</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.framework</groupId>
+      <artifactId>rimfrost-framework-regel</artifactId>
+      <version>0.0.2</version>
     </dependency>
   </dependencies>
 

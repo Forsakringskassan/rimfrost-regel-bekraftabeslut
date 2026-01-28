@@ -7,8 +7,9 @@ import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.OnOverflow;
 import se.fk.github.bekraftabeslut.integration.kafka.dto.BekraftaBeslutResponseRequest;
-import se.fk.github.bekraftabeslut.integration.kafka.dto.ImmutableOulMessageRequest;
+import se.fk.rimfrost.OperativtUppgiftslagerRequestMessage;
 import se.fk.rimfrost.OperativtUppgiftslagerStatusMessage;
+import se.fk.rimfrost.framework.integration.kafka.dto.ImmutableOulMessageRequest;
 import se.fk.rimfrost.regel.bekraftabeslut.BekraftaBeslutResponseMessagePayload;
 import se.fk.rimfrost.Status;
 

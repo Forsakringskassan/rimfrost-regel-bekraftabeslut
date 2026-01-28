@@ -13,15 +13,12 @@ import jakarta.inject.Inject;
 import se.fk.github.bekraftabeslut.integration.arbetsgivare.ArbetsgivareAdapter;
 import se.fk.github.bekraftabeslut.integration.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.github.bekraftabeslut.integration.arbetsgivare.dto.ImmutableArbetsgivareRequest;
-import se.fk.github.bekraftabeslut.integration.config.RegelConfigProvider;
 import se.fk.github.bekraftabeslut.integration.folkbokford.FolkbokfordAdapter;
 import se.fk.github.bekraftabeslut.integration.folkbokford.dto.FolkbokfordResponse;
 import se.fk.github.bekraftabeslut.integration.folkbokford.dto.ImmutableFolkbokfordRequest;
 import se.fk.github.bekraftabeslut.integration.kafka.BekraftaBeslutKafkaProducer;
-import se.fk.github.bekraftabeslut.integration.kafka.dto.ImmutableOulMessageRequest;
 import se.fk.github.bekraftabeslut.integration.kundbehovsflode.KundbehovsflodeAdapter;
 import se.fk.github.bekraftabeslut.integration.kundbehovsflode.dto.ImmutableKundbehovsflodeRequest;
-import se.fk.github.bekraftabeslut.logic.config.RegelConfig;
 import se.fk.github.bekraftabeslut.logic.entity.CloudEventData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableCloudEventData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableErsattningData;
@@ -36,22 +33,39 @@ import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataRequest;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.UpdateErsattningDataRequest;
 import se.fk.github.bekraftabeslut.logic.dto.UpdateBekraftaBeslutDataRequest;
+import se.fk.github.bekraftabeslut.logic.dto.UpdateStatusRequest;
+import se.fk.rimfrost.framework.integration.config.RegelConfigProvider;
+import se.fk.rimfrost.framework.integration.config.RegelConfigProviderYaml;
+import se.fk.rimfrost.framework.integration.kafka.OulKafkaProducer;
+import se.fk.rimfrost.framework.integration.kafka.RegelKafkaProducer;
+import se.fk.rimfrost.framework.integration.kafka.dto.ImmutableOulMessageRequest;
+import se.fk.rimfrost.framework.logic.config.RegelConfig;
+import se.fk.rimfrost.framework.logic.dto.OulResponse;
+import se.fk.rimfrost.framework.logic.dto.OulStatus;
+import se.fk.rimfrost.framework.logic.dto.RegelDataRequest;
+import se.fk.rimfrost.framework.presentation.kafka.OulHandlerInterface;
+import se.fk.rimfrost.framework.presentation.kafka.RegelRequestHandlerInterface;
+import se.fk.rimfrost.regel.common.Utfall;
 
-import se.fk.github.bekraftabeslut.logic.dto.UpdateStatusRequest; 
 
 @ApplicationScoped
 @Startup
-public class BekraftaBeslutService
+public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulHandlerInterface
 {
 
    @Inject
-   RegelConfigProvider regelConfigProvider;
+   RegelConfigProviderYaml regelConfigProvider;
 
    @Inject
    ObjectMapper objectMapper;
 
    @Inject
    BekraftaBeslutKafkaProducer kafkaProducer;
+
+    @Inject
+    RegelKafkaProducer regelKafkaProducer;
+
+    OulKafkaProducer oulKafkaProducer;
 
    @Inject
    BekraftaBeslutMapper mapper;
@@ -100,7 +114,8 @@ public class BekraftaBeslutService
       return mapper.toBekraftaBeslutResponse(kundbehovflodesResponse, folkbokfordResponse, arbetsgivareResponse, bekraftaBeslutData);
    }
 
-   public void createBekraftaBeslutData(CreateBekraftaBeslutDataRequest request)
+   @Override
+   public void handleRegelRequest(RegelDataRequest request)
    {
       var kundbehovsflodeRequest = ImmutableKundbehovsflodeRequest.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
@@ -141,22 +156,22 @@ public class BekraftaBeslutService
       var oulMessageRequest = ImmutableOulMessageRequest.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
             .kundbehov("Vård av husdjur")
-            .regel(regelConfig.getUppgift().getNamn())
-            .beskrivning(regelConfig.getUppgift().getBeskrivning())
-            .verksamhetslogik(regelConfig.getUppgift().getVerksamhetslogik())
-            .roll(regelConfig.getUppgift().getRoll())
+            .regel(regelConfig.getSpecifikation().getNamn())
+            .beskrivning(regelConfig.getSpecifikation().getUppgiftbeskrivning())
+            .verksamhetslogik(regelConfig.getSpecifikation().getVerksamhetslogik())
+            .roll(regelConfig.getSpecifikation().getRoll())
             .url("http://localhost:8888" + regelConfig.getUppgift().getPath() + "/" + request.kundbehovsflodeId().toString())
             .build();
-      kafkaProducer.sendOulRequest(oulMessageRequest);
+      oulKafkaProducer.sendOulRequest(oulMessageRequest);
    }
 
-
-   public void updateBekraftaBeslutData(UpdateBekraftaBeslutDataRequest updateRequest)
+    @Override
+   public void handleOulResponse(OulResponse oulResponse)
    {
-      var bekraftaBeslutData = bekraftaBeslutDatas.get(updateRequest.kundbehovsflodeId());
+      var bekraftaBeslutData = bekraftaBeslutDatas.get(oulResponse.kundbehovsflodeId());
       var updatedBekraftaBeslutData = ImmutableBekraftaBeslutData.builder()
             .from(bekraftaBeslutData)
-            .uppgiftId(updateRequest.uppgiftId())
+            .uppgiftId(oulResponse.uppgiftId())
             .build();
       bekraftaBeslutDatas.put(updatedBekraftaBeslutData.kundbehovsflodeId(), updatedBekraftaBeslutData);
       updateKundbehovsflodeInfo(updatedBekraftaBeslutData);
@@ -192,21 +207,28 @@ public class BekraftaBeslutService
 
       if (updateRequest.signerad())
       {
-         var rattTillForsakring = updatedList.stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA);
+         var allErsattningarApproved = updatedList.stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA);
+         Utfall utfall;
+         if (allErsattningarApproved) {
+             utfall = Utfall.JA;
+         } else {
+             utfall = Utfall.NEJ;
+         }
          var cloudevent = cloudevents.get(updatedBekraftaBeslutData.cloudeventId());
-         var bekraftaBeslutResponse = mapper.toBekraftaBeslutResponseRequest(updatedBekraftaBeslutData, cloudevent, rattTillForsakring);
-         kafkaProducer.sendOulStatusUpdate(updatedBekraftaBeslutData.uppgiftId(), Status.AVSLUTAD);
-         kafkaProducer.sendBekraftaBeslutResponse(bekraftaBeslutResponse);
+         var regelResponse = mapper.toRegelResponse(updatedBekraftaBeslutData, cloudevent, utfall);
+         oulKafkaProducer.sendOulStatusUpdate(updatedBekraftaBeslutData.uppgiftId(), Status.AVSLUTAD);
+         regelKafkaProducer.sendRegelResponse(regelResponse, "SOURCE_TODO");
       }
    }
 
-   public void updateStatus(UpdateStatusRequest request)
+   @Override
+   public void handleOulStatus(OulStatus oulStatus)
    {
       BekraftaBeslutData bekraftaBeslutData = bekraftaBeslutDatas.values()
             .stream()
-            .filter(r -> r.uppgiftId().equals(request.uppgiftId()))
+            .filter(r -> r.uppgiftId().equals(oulStatus.uppgiftId()))
             .findFirst()
-            .orElse(bekraftaBeslutDatas.get(request.kundbehovsflodeId()));
+            .orElse(bekraftaBeslutDatas.get(oulStatus.kundbehovsflodeId()));
       updateKundbehovsflodeInfo(bekraftaBeslutData);
    }
 
@@ -240,7 +262,7 @@ public class BekraftaBeslutService
 
    private void updateKundbehovsflodeInfo(BekraftaBeslutData bekraftaBeslutData)
    {
-      var request = mapper.toUpdateKundbehovsflodeRequest(bekraftaBeslutData);
+      var request = mapper.toUpdateKundbehovsflodeRequest(bekraftaBeslutData, regelConfigProvider.getConfig());
       kundbehovsflodeAdapter.updateKundbehovsflodeInfo(request);
    }
 }
