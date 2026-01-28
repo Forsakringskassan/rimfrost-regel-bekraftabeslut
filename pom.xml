@@ -7,20 +7,25 @@
     <artifactId>fk-maven-quarkus-parent</artifactId>
     <version>1.11.1</version>
   </parent>
-
   <groupId>se.fk.rimfrost</groupId>
   <artifactId>rimfrost-regel-bekraftabeslut</artifactId>
   <version>1.0.1-SNAPSHOT</version>
-
+  <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-health</artifactId>
+  </dependency>
   <properties>
     <violations.maxViolations>0</violations.maxViolations>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-messaging-kafka</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-health</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -72,6 +77,11 @@
       <version>0.0.2</version>
     </dependency>
     <dependency>
+      <groupId>se.fk.rimfrost.regel.common</groupId>
+      <artifactId>rimfrost-regel-common-asyncapi</artifactId>
+      <version>0.1.1</version>
+    </dependency>
+    <dependency>
       <groupId>se.fk.rimfrost.regel.bekraftabeslut.openapi</groupId>
       <artifactId>rimfrost-regel-bekraftabeslut-openapi-jaxrs-spec</artifactId>
       <version>0.0.0</version>
@@ -90,6 +100,11 @@
       <groupId>se.fk.rimfrost</groupId>
       <artifactId>rimfrost-service-kundbehovsflode-openapi-jaxrs-spec</artifactId>
       <version>1.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.common</groupId>
+      <artifactId>rimfrost-common</artifactId>
+      <version>0.0.5</version>
     </dependency>
   </dependencies>
 

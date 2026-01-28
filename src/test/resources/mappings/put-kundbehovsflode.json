@@ -86,10 +86,10 @@
           "uppgiftbeskrivning": "Kontrollera om personen varit på jobbet",
           "verksamhetslogik": "A",
           "roll": "ANSVARIG_HANDLAGGARE",
-          "applikationsId": "rtf-manuell",
+          "applikationsId": "bekraftabeslut",
           "applikationsVersion": "1.0",
           "regel": [],
-          "uppgiftsGui": "rtf-manuell/482a43b7-c985-4f65-ae41-fb75de3a6a6f"
+          "uppgiftsGui": "bekraftabeslut/482a43b7-c985-4f65-ae41-fb75de3a6a6f"
         },
         "underlag": []
       }
