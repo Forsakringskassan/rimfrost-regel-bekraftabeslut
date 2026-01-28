@@ -1,19 +1,16 @@
 package se.fk.github.bekraftabeslut.integration.kundbehovsflode.dto;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.immutables.value.Value;
 
-import jakarta.annotation.Nullable;
+import java.util.List;
+import java.util.UUID;
 
 @Value.Immutable
 public interface UpdateKundbehovsflodeRequest
 {
    UUID kundbehovsflodeId();
 
-   @Nullable
-   UUID uppgiftId();
+   UpdateKundbehovsflodeUppgift uppgift();
 
    List<UpdateKundbehovsflodeErsattning> ersattningar();
 

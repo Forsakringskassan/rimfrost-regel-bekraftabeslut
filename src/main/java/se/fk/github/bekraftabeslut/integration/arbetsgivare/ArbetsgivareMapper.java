@@ -18,8 +18,8 @@ public class ArbetsgivareMapper
             .organisationsnummer(anstallning.getOrganisation().getNummer())
             .anstallningsdag(anstallning.getStartdag())
             .arbetstidProcent(anstallning.getArbetstid())
-            .lonFrom(anstallning.getStartdag()) //TODO Lon should be in apiResponse
-            .loneSumma(40000) //TODO Lon should be in apiResponse
+            .lonFrom(anstallning.getStartdag())
+            .loneSumma(40000)
             .build();
    }
 }
