@@ -58,7 +58,7 @@ public class BekraftaBeslutKafkaMapper
       switch (status)
       {
          case NY:
-            return UppgiftStatus.NY;
+            return UppgiftStatus.PLANERAD;
          case TILLDELAD:
             return UppgiftStatus.TILLDELAD;
          case AVSLUTAD:
