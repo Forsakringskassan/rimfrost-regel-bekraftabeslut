@@ -7,34 +7,38 @@ import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
-public class WireMockTestResource implements QuarkusTestResourceLifecycleManager {
+public class WireMockTestResource implements QuarkusTestResourceLifecycleManager
+{
 
-private static WireMockServer server;
-    public static WireMockServer getWireMockServer() {
-        return server;
-    }
+   private static WireMockServer server;
 
-  @Override
-  public Map<String, String> start() {
-    server = new WireMockServer(
-        options()
-          .dynamicPort()
-          .usingFilesUnderDirectory("src/test/resources")
-    );
-    server.start();
-    //server.resetAll();
+   public static WireMockServer getWireMockServer()
+   {
+      return server;
+   }
 
-    return Map.of(
-      "folkbokford.api.base-url", server.baseUrl(),
-      "arbetsgivare.api.base-url", server.baseUrl(),
-      "kundbehovsflode.api.base-url", server.baseUrl()
-    );
-  }
+   @Override
+   public Map<String, String> start()
+   {
+      server = new WireMockServer(
+            options()
+                  .dynamicPort()
+                  .usingFilesUnderDirectory("src/test/resources"));
+      server.start();
+      //server.resetAll();
+    System.out.printf("XXX WireMockTestResource start server.baseUrl() = %s%n", server.baseUrl());
+      return Map.of(
+            "folkbokford.api.base-url", server.baseUrl(),
+            "arbetsgivare.api.base-url", server.baseUrl(),
+            "kundbehovsflode.api.base-url", server.baseUrl());
+   }
 
-  @Override
-  public void stop() {
-    if (server != null) {
-      server.stop();
-    }
-  }
+   @Override
+   public void stop()
+   {
+      if (server != null)
+      {
+         server.stop();
+      }
+   }
 }

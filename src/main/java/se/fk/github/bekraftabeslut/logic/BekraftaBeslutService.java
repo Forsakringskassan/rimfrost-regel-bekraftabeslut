@@ -47,7 +47,6 @@ import se.fk.rimfrost.framework.presentation.kafka.OulHandlerInterface;
 import se.fk.rimfrost.framework.presentation.kafka.RegelRequestHandlerInterface;
 import se.fk.rimfrost.regel.common.Utfall;
 
-
 @ApplicationScoped
 @Startup
 public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulHandlerInterface
@@ -62,10 +61,10 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
    @Inject
    BekraftaBeslutKafkaProducer kafkaProducer;
 
-    @Inject
-    RegelKafkaProducer regelKafkaProducer;
+   @Inject
+   RegelKafkaProducer regelKafkaProducer;
 
-    OulKafkaProducer oulKafkaProducer;
+   OulKafkaProducer oulKafkaProducer;
 
    @Inject
    BekraftaBeslutMapper mapper;
@@ -111,16 +110,21 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
 
       updateKundbehovsflodeInfo(bekraftaBeslutData);
 
-      return mapper.toBekraftaBeslutResponse(kundbehovflodesResponse, folkbokfordResponse, arbetsgivareResponse, bekraftaBeslutData);
+      return mapper.toBekraftaBeslutResponse(kundbehovflodesResponse, folkbokfordResponse, arbetsgivareResponse,
+            bekraftaBeslutData);
    }
 
    @Override
    public void handleRegelRequest(RegelDataRequest request)
    {
+      System.out.printf("HIT handleRegelRequest in BekraftaBeslutService%n%n");
+      System.out.printf("handleRegelRequest request.kundbehovsflodeId() =  %s%n", request.kundbehovsflodeId());
       var kundbehovsflodeRequest = ImmutableKundbehovsflodeRequest.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
             .build();
+      System.out.printf("handleRegelRequest 1%n");
       var kundbehovflodesResponse = kundbehovsflodeAdapter.getKundbehovsflodeInfo(kundbehovsflodeRequest);
+      System.out.printf("handleRegelRequest 2%n");
 
       var cloudeventData = ImmutableCloudEventData.builder()
             .id(request.id())
@@ -132,6 +136,7 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
             .kogitorootprocid(request.kogitorootprocid())
             .kogitorootprociid(request.kogitorootprociid())
             .build();
+      System.out.printf("handleRegelRequest 3%n");
 
       var ersattninglist = new ArrayList<ErsattningData>();
 
@@ -143,6 +148,8 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
          ersattninglist.add(ersattningData);
       }
 
+      System.out.printf("handleRegelRequest 4%n");
+
       var bekraftaBeslutData = ImmutableBekraftaBeslutData.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
             .uppgiftId(UUID.randomUUID())
@@ -150,9 +157,12 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
             .ersattningar(ersattninglist)
             .underlag(new ArrayList<>())
             .build();
+      System.out.printf("handleRegelRequest 5%n");
 
       cloudevents.put(cloudeventData.id(), cloudeventData);
       bekraftaBeslutDatas.put(bekraftaBeslutData.kundbehovsflodeId(), bekraftaBeslutData);
+      System.out.printf("handleRegelRequest 6%n");
+
       var oulMessageRequest = ImmutableOulMessageRequest.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
             .kundbehov("Vård av husdjur")
@@ -162,10 +172,14 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
             .roll(regelConfig.getSpecifikation().getRoll())
             .url("http://localhost:8888" + regelConfig.getUppgift().getPath() + "/" + request.kundbehovsflodeId().toString())
             .build();
+      System.out.printf("handleRegelRequest 7%n");
+
       oulKafkaProducer.sendOulRequest(oulMessageRequest);
+      System.out.printf("handleRegelRequest 8%n");
+
    }
 
-    @Override
+   @Override
    public void handleOulResponse(OulResponse oulResponse)
    {
       var bekraftaBeslutData = bekraftaBeslutDatas.get(oulResponse.kundbehovsflodeId());
@@ -209,10 +223,13 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
       {
          var allErsattningarApproved = updatedList.stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA);
          Utfall utfall;
-         if (allErsattningarApproved) {
-             utfall = Utfall.JA;
-         } else {
-             utfall = Utfall.NEJ;
+         if (allErsattningarApproved)
+         {
+            utfall = Utfall.JA;
+         }
+         else
+         {
+            utfall = Utfall.NEJ;
          }
          var cloudevent = cloudevents.get(updatedBekraftaBeslutData.cloudeventId());
          var regelResponse = mapper.toRegelResponse(updatedBekraftaBeslutData, cloudevent, utfall);

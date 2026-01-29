@@ -30,12 +30,18 @@ public class KundbehovsflodeAdapter
       this.kundbehovsClient = new JaxrsClientFactory()
             .create(JaxrsClientOptionsBuilders.createClient(kundbehovsflodeBaseUrl, KundbehovsflodeControllerApi.class)
                   .build());
+      System.out.printf("XXX KundbehovsflodeAdapter init kundbehovsflodeBaseUrl = %s%n", kundbehovsflodeBaseUrl);
    }
 
    public KundbehovsflodeResponse getKundbehovsflodeInfo(KundbehovsflodeRequest kundbehovsflodeRequest)
    {
-      var apiResponse = kundbehovsClient.getKundbehovsflode(kundbehovsflodeRequest.kundbehovsflodeId());
-      return mapper.toKundbehovsflodeResponse(apiResponse);
+       System.out.printf("HIT getKundbehovsflodeInfo %n");
+       System.out.printf("HIT getKundbehovsflodeInfo kundbehovsflodeRequest.kundbehovsflodeId() = %s%n", kundbehovsflodeRequest.kundbehovsflodeId());
+
+       var apiResponse = kundbehovsClient.getKundbehovsflode(kundbehovsflodeRequest.kundbehovsflodeId());
+       System.out.printf("HIT getKundbehovsflodeInfo 2%n");
+
+       return mapper.toKundbehovsflodeResponse(apiResponse);
    }
 
    public void updateKundbehovsflodeInfo(UpdateKundbehovsflodeRequest request)

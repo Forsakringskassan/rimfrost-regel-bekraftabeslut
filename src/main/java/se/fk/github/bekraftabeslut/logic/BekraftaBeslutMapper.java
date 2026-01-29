@@ -23,7 +23,6 @@ import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.Roll;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.Verksamhetslogik;
 import se.fk.rimfrost.regel.common.Utfall;
 
-
 @ApplicationScoped
 public class BekraftaBeslutMapper
 {
@@ -87,7 +86,7 @@ public class BekraftaBeslutMapper
    }
 
    public RegelResponse toRegelResponse(BekraftaBeslutData bekraftaBeslutData,
-                                        CloudEventData cloudevent, Utfall utfall)
+         CloudEventData cloudevent, Utfall utfall)
    {
       return ImmutableRegelResponse.builder()
             .id(cloudevent.id())
@@ -103,84 +102,84 @@ public class BekraftaBeslutMapper
             .build();
    }
 
-    public UpdateKundbehovsflodeRequest toUpdateKundbehovsflodeRequest(BekraftaBeslutData bekraftaBeslutData, RegelConfig regelConfig)
-    {
+   public UpdateKundbehovsflodeRequest toUpdateKundbehovsflodeRequest(BekraftaBeslutData bekraftaBeslutData,
+         RegelConfig regelConfig)
+   {
 
-        var lagrum = ImmutableUpdateKundbehovsflodeLagrum.builder()
-                .id(regelConfig.getLagrum().getId())
-                .version(regelConfig.getLagrum().getVersion())
-                .forfattning(regelConfig.getLagrum().getForfattning())
-                .giltigFrom(regelConfig.getLagrum().getGiltigFom().toInstant().atOffset(ZoneOffset.UTC))
-                .kapitel(regelConfig.getLagrum().getKapitel())
-                .paragraf(regelConfig.getLagrum().getParagraf())
-                .stycke(regelConfig.getLagrum().getStycke())
-                .punkt(regelConfig.getLagrum().getPunkt())
-                .build();
+      var lagrum = ImmutableUpdateKundbehovsflodeLagrum.builder()
+            .id(regelConfig.getLagrum().getId())
+            .version(regelConfig.getLagrum().getVersion())
+            .forfattning(regelConfig.getLagrum().getForfattning())
+            .giltigFrom(regelConfig.getLagrum().getGiltigFom().toInstant().atOffset(ZoneOffset.UTC))
+            .kapitel(regelConfig.getLagrum().getKapitel())
+            .paragraf(regelConfig.getLagrum().getParagraf())
+            .stycke(regelConfig.getLagrum().getStycke())
+            .punkt(regelConfig.getLagrum().getPunkt())
+            .build();
 
-        var regel = ImmutableUpdateKundbehovsflodeRegel.builder()
-                .id(regelConfig.getRegel().getId())
-                .beskrivning(regelConfig.getRegel().getBeskrivning())
-                .namn(regelConfig.getRegel().getNamn())
-                .version(regelConfig.getRegel().getVersion())
-                .lagrum(lagrum)
-                .build();
+      var regel = ImmutableUpdateKundbehovsflodeRegel.builder()
+            .id(regelConfig.getRegel().getId())
+            .beskrivning(regelConfig.getRegel().getBeskrivning())
+            .namn(regelConfig.getRegel().getNamn())
+            .version(regelConfig.getRegel().getVersion())
+            .lagrum(lagrum)
+            .build();
 
-        var specifikation = ImmutableUpdateKundbehovsflodeSpecifikation.builder()
-                .id(regelConfig.getSpecifikation().getId())
-                .version(regelConfig.getSpecifikation().getVersion())
-                .namn(regelConfig.getSpecifikation().getNamn())
-                .uppgiftsbeskrivning(regelConfig.getSpecifikation().getUppgiftbeskrivning())
-                .verksamhetslogik(Verksamhetslogik.fromString(regelConfig.getSpecifikation().getVerksamhetslogik()))
-                .roll(Roll.fromString(regelConfig.getSpecifikation().getRoll()))
-                .applikationsId(regelConfig.getSpecifikation().getApplikationsId())
-                .applikationsversion(regelConfig.getSpecifikation().getApplikationsversion())
-                .url(regelConfig.getUppgift().getPath())
-                .regel(regel)
-                .build();
+      var specifikation = ImmutableUpdateKundbehovsflodeSpecifikation.builder()
+            .id(regelConfig.getSpecifikation().getId())
+            .version(regelConfig.getSpecifikation().getVersion())
+            .namn(regelConfig.getSpecifikation().getNamn())
+            .uppgiftsbeskrivning(regelConfig.getSpecifikation().getUppgiftbeskrivning())
+            .verksamhetslogik(Verksamhetslogik.fromString(regelConfig.getSpecifikation().getVerksamhetslogik()))
+            .roll(Roll.fromString(regelConfig.getSpecifikation().getRoll()))
+            .applikationsId(regelConfig.getSpecifikation().getApplikationsId())
+            .applikationsversion(regelConfig.getSpecifikation().getApplikationsversion())
+            .url(regelConfig.getUppgift().getPath())
+            .regel(regel)
+            .build();
 
-        var uppgift = ImmutableUpdateKundbehovsflodeUppgift.builder()
-                .id(bekraftaBeslutData.uppgiftId())
-                .version(regelConfig.getUppgift().getVersion())
-                .skapadTs(bekraftaBeslutData.skapadTs())
-                .utfordTs(bekraftaBeslutData.utfordTs())
-                .planeradTs(bekraftaBeslutData.planeradTs())
-                .utforarId(bekraftaBeslutData.utforarId())
-                .uppgiftStatus(bekraftaBeslutData.uppgiftStatus())
-                .aktivitet(regelConfig.getUppgift().getAktivitet())
-                .fsSAinformation(bekraftaBeslutData.fssaInformation())
-                .specifikation(specifikation)
-                .build();
+      var uppgift = ImmutableUpdateKundbehovsflodeUppgift.builder()
+            .id(bekraftaBeslutData.uppgiftId())
+            .version(regelConfig.getUppgift().getVersion())
+            .skapadTs(bekraftaBeslutData.skapadTs())
+            .utfordTs(bekraftaBeslutData.utfordTs())
+            .planeradTs(bekraftaBeslutData.planeradTs())
+            .utforarId(bekraftaBeslutData.utforarId())
+            .uppgiftStatus(bekraftaBeslutData.uppgiftStatus())
+            .aktivitet(regelConfig.getUppgift().getAktivitet())
+            .fsSAinformation(bekraftaBeslutData.fssaInformation())
+            .specifikation(specifikation)
+            .build();
 
-        var requestBuilder = ImmutableUpdateKundbehovsflodeRequest.builder()
-                .kundbehovsflodeId(bekraftaBeslutData.kundbehovsflodeId())
-                .uppgift(uppgift)
-                .underlag(new ArrayList<UpdateKundbehovsflodeUnderlag>());
+      var requestBuilder = ImmutableUpdateKundbehovsflodeRequest.builder()
+            .kundbehovsflodeId(bekraftaBeslutData.kundbehovsflodeId())
+            .uppgift(uppgift)
+            .underlag(new ArrayList<UpdateKundbehovsflodeUnderlag>());
 
-        for (ErsattningData rtfErsattning : bekraftaBeslutData.ersattningar())
-        {
-            var ersattning = ImmutableUpdateKundbehovsflodeErsattning.builder()
-                    .beslutsutfall(mapBeslutsutfall(rtfErsattning.beslutsutfall()))
-                    .id(rtfErsattning.id())
-                    .avslagsanledning(rtfErsattning.avslagsanledning())
-                    .build();
-            requestBuilder.addErsattningar(ersattning);
-        }
+      for (ErsattningData rtfErsattning : bekraftaBeslutData.ersattningar())
+      {
+         var ersattning = ImmutableUpdateKundbehovsflodeErsattning.builder()
+               .beslutsutfall(mapBeslutsutfall(rtfErsattning.beslutsutfall()))
+               .id(rtfErsattning.id())
+               .avslagsanledning(rtfErsattning.avslagsanledning())
+               .build();
+         requestBuilder.addErsattningar(ersattning);
+      }
 
-        for (var rtfUnderlag : bekraftaBeslutData.underlag())
-        {
-            var underlag = ImmutableUpdateKundbehovsflodeUnderlag.builder()
-                    .typ(rtfUnderlag.typ())
-                    .version(rtfUnderlag.version())
-                    .data(rtfUnderlag.data())
-                    .build();
-            requestBuilder.addUnderlag(underlag);
-        }
+      for (var rtfUnderlag : bekraftaBeslutData.underlag())
+      {
+         var underlag = ImmutableUpdateKundbehovsflodeUnderlag.builder()
+               .typ(rtfUnderlag.typ())
+               .version(rtfUnderlag.version())
+               .data(rtfUnderlag.data())
+               .build();
+         requestBuilder.addUnderlag(underlag);
+      }
 
-        return requestBuilder.build();
-    }
+      return requestBuilder.build();
+   }
 
-
-    private BeslutsutfallEnum mapBeslutsutfall(
+   private BeslutsutfallEnum mapBeslutsutfall(
          Beslutsutfall beslutsutfall)
    {
       if (beslutsutfall == null)

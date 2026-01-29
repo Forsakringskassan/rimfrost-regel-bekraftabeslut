@@ -43,7 +43,8 @@ public class BekraftaBeslutKafkaProducer
       bekraftaBeslutResponseEmitter.send(response);
    }
 
-   public void sendOulRequest(ImmutableOulMessageRequest oulMessageRequest) {
+   public void sendOulRequest(ImmutableOulMessageRequest oulMessageRequest)
+   {
       throw new UnsupportedOperationException("Unimplemented method 'sendOulRequest'");
    }
 }

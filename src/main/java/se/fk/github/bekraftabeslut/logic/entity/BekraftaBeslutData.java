@@ -14,30 +14,30 @@ import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.FSSAinformatio
 public interface BekraftaBeslutData
 {
 
-    UUID kundbehovsflodeId();
+   UUID kundbehovsflodeId();
 
-    UUID cloudeventId();
+   UUID cloudeventId();
 
-    @Nullable
-    UUID uppgiftId();
+   @Nullable
+   UUID uppgiftId();
 
-    @Nullable
-    UUID utforarId();
+   @Nullable
+   UUID utforarId();
 
-    OffsetDateTime skapadTs();
+   OffsetDateTime skapadTs();
 
-    @Nullable
-    OffsetDateTime utfordTs();
+   @Nullable
+   OffsetDateTime utfordTs();
 
-    @Nullable
-    OffsetDateTime planeradTs();
+   @Nullable
+   OffsetDateTime planeradTs();
 
-    UppgiftStatus uppgiftStatus();
+   UppgiftStatus uppgiftStatus();
 
-    FSSAinformation fssaInformation();
+   FSSAinformation fssaInformation();
 
-    List<ErsattningData> ersattningar();
+   List<ErsattningData> ersattningar();
 
-    List<Underlag> underlag();
+   List<Underlag> underlag();
 
 }
