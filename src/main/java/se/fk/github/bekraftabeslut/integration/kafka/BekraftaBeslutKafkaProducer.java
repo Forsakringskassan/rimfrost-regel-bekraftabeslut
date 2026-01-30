@@ -13,10 +13,10 @@ import se.fk.rimfrost.framework.integration.kafka.dto.ImmutableOulMessageRequest
 import se.fk.rimfrost.regel.bekraftabeslut.BekraftaBeslutResponseMessagePayload;
 import se.fk.rimfrost.Status;
 
-@ApplicationScoped
+//@ApplicationScoped
 public class BekraftaBeslutKafkaProducer
 {
-   @Inject
+/*   @Inject
    BekraftaBeslutKafkaMapper mapper;
 
    @Inject
@@ -46,5 +46,5 @@ public class BekraftaBeslutKafkaProducer
    public void sendOulRequest(ImmutableOulMessageRequest oulMessageRequest)
    {
       throw new UnsupportedOperationException("Unimplemented method 'sendOulRequest'");
-   }
+   }*/
 }

@@ -6,7 +6,9 @@
   "response": {
     "status": 200,
     "headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "BREADCRUMB-ID": "test-breadcrumb",
+      "PROCESSID": "test-process"
     },
     "jsonBody": {
       "kundbehovsflode": {

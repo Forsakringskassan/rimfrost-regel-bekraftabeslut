@@ -6,7 +6,9 @@
   "response": {
     "status": 200,
     "headers": {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "BREADCRUMB-ID": "test-breadcrumb",
+      "PROCESSID": "test-process"
     },
     "jsonBody": {
       "kundbehovsflode": {
@@ -75,7 +77,20 @@
               "roll": "AGARE",
               "applikationsId": "app123",
               "applikationsVersion": "1.0",
-              "regel": [],
+              "regel": {
+                "id": "61234567-88ab-4cde-9012-3456789abcde",
+                "version": "1.0",
+                "lagrum": {
+                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                  "version": "1.0",
+                  "giltigFrom": "2025-01-01T00:00:00Z",
+                  "giltigTom": "2026-01-01T00:00:00Z",
+                  "forfattning": "TestForfattning",
+                  "kapitel": "1",
+                  "paragraf": "2",
+                  "stycke": "3",
+                  "punkt": "4"
+                }              },
               "uppgiftsGui": "GUI1"
             }
           ]

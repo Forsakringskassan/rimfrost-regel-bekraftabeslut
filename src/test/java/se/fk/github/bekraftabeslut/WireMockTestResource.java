@@ -26,11 +26,12 @@ public class WireMockTestResource implements QuarkusTestResourceLifecycleManager
                   .usingFilesUnderDirectory("src/test/resources"));
       server.start();
       //server.resetAll();
-    System.out.printf("XXX WireMockTestResource start server.baseUrl() = %s%n", server.baseUrl());
+      System.out.printf("XXX WireMockTestResource start server.baseUrl() = %s%n", server.baseUrl());
       return Map.of(
+            "quarkus.rest-client.kundbehovsflode.url", server.baseUrl(),
             "folkbokford.api.base-url", server.baseUrl(),
             "arbetsgivare.api.base-url", server.baseUrl(),
-            "kundbehovsflode.api.base-url", server.baseUrl());
+      "kundbehovsflode.api.base-url", server.baseUrl());
    }
 
    @Override

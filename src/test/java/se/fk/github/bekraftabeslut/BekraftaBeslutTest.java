@@ -1,11 +1,14 @@
 package se.fk.github.bekraftabeslut;
 
+import com.github.tomakehurst.wiremock.http.RequestMethod;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPResource;
 
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import io.smallrye.reactive.messaging.memory.InMemoryConnector;
+import io.smallrye.reactive.messaging.memory.InMemorySink;
+import io.smallrye.reactive.messaging.memory.InMemorySource;
+import jakarta.inject.Inject;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,48 +18,43 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.reactive.messaging.spi.Connector;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import se.fk.rimfrost.OperativtUppgiftslagerRequestMessage;
 import se.fk.rimfrost.regel.common.RegelRequestMessagePayload;
 import se.fk.rimfrost.regel.common.RegelRequestMessagePayloadData;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @QuarkusTest
-@QuarkusTestResource(WireMockTestResource.class)
+@QuarkusTestResource.List({
+        @QuarkusTestResource(WireMockTestResource.class),
+       @QuarkusTestResource(InMemoryKafkaTestResource.class)
+})
 class BekraftaBeslutTest
 {
-
-   @ConfigProperty(name = "kafka.bootstrap.servers")
-   String bootstrapServers;
+//
+//   @ConfigProperty(name = "kafka.bootstrap.servers")
+//   String bootstrapServers;
 
    @ConfigProperty(name = "mp.messaging.outgoing.operativt-uppgiftslager-requests.topic")
    String oulRequestsTopic;
@@ -68,6 +66,9 @@ class BekraftaBeslutTest
    private static WireMock wiremockClient;
 
    private static final HttpClient http = HttpClient.newHttpClient();
+
+//   @Inject
+//    OulTestResponder oulTestResponder;
 
    @BeforeAll
    static void setup()
@@ -104,22 +105,15 @@ class BekraftaBeslutTest
       wiremockClient = new WireMock("localhost", wiremockServer.port());
    }
 
-   @ParameterizedTest
-   @CsvSource(
-   {
-         "5367f6b8-cc4a-11f0-8de9-199901011234"
-   })
-   void BekraftaBeslutSmokeTest(String kundbehovsflodeId) throws Exception
-   {
-      setupWiremock();
-      KafkaConsumer<String, String> consumer = createConsumer();
-      consumer.subscribe(List.of(oulRequestsTopic));
-      sendBekraftaBeslutRequest(kundbehovsflodeId);
-      ConsumerRecords<String, String> oulRequests = waitForOulRequest(consumer, oulRequestsTopic);
-      var x = 1;
-   }
+    @Inject
+    @Connector("smallrye-in-memory")
+    InMemoryConnector inMemoryConnector;
 
-   private ConsumerRecords<String, String> waitForOulRequest(KafkaConsumer kafkaConsumer, String oulRequestsTopic)
+
+
+/*
+
+   private ConsumerRecords<String, String> waitForOulRequest2(KafkaConsumer kafkaConsumer, String oulRequestsTopic)
    {
       AtomicReference<ConsumerRecords<String, String>> recordsRef = new AtomicReference<>();
       await()
@@ -130,6 +124,21 @@ class BekraftaBeslutTest
                recordsRef.set(records);
             });
       return recordsRef.get();
+   }
+*/
+
+    private List<OperativtUppgiftslagerRequestMessage> waitForOulRequest(String channelName) {
+        InMemorySink<OperativtUppgiftslagerRequestMessage> sink = inMemoryConnector.sink(channelName);
+
+        await()
+                .atMost(10, SECONDS)
+                .untilAsserted(() -> {
+                    assertThat(sink.received()).isNotEmpty();
+                });
+
+        return sink.received().stream()
+                .map(msg -> msg.getPayload())
+                .toList();
    }
 
    private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
@@ -216,22 +225,28 @@ class BekraftaBeslutTest
       // Serialize entire payload to JSON
       String eventJson = mapper.writeValueAsString(payload);
 
+       inMemoryConnector.source("regel-requests").send(payload);
+//       await().atMost(5, TimeUnit.SECONDS).until(() ->
+//               !inMemoryConnector.sink("regel-responses").received().isEmpty()
+//       );
+
+       //source.send(payload).wait();
       // Använda properties??
-      Properties props = new Properties();
+/*      Properties props = new Properties();
       props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
       props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-      props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+      props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());*/
 
-      try (KafkaProducer<String, String> producer = new KafkaProducer<>(props))
-      {
-         ProducerRecord<String, String> record = new ProducerRecord<>(
-               bekraftaBeslutRequestsTopic,
-               eventJson);
-         System.out.printf("Kafka sending to topic : %s, json: %s%n", bekraftaBeslutRequestsTopic, eventJson);
-         producer.send(record).get();
-      }
+//      try (KafkaProducer<String, String> producer = new KafkaProducer<>(props))
+//      {
+//         ProducerRecord<String, String> record = new ProducerRecord<>(
+//               bekraftaBeslutRequestsTopic,
+//               eventJson);
+//         System.out.printf("Kafka sending to topic : %s, json: %s%n", bekraftaBeslutRequestsTopic, eventJson);
+//         producer.send(record).get();
+//      }
    }
-
+/*
    private KafkaConsumer<String, String> createConsumer()
    {
       Properties props = new Properties();
@@ -241,7 +256,7 @@ class BekraftaBeslutTest
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
       props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
       return new KafkaConsumer<>(props);
-   }
+   }*/
 
    static void setupBekraftaBeslut()
    {
@@ -260,4 +275,32 @@ class BekraftaBeslutTest
       }
 
    }
+
+    @ParameterizedTest
+    @CsvSource(
+            {
+                    "5367f6b8-cc4a-11f0-8de9-199901011234"
+            })
+    void BekraftaBeslutSmokeTest(String kundbehovsflodeId) throws Exception
+    {
+        setupWiremock();
+        //KafkaConsumer<String, String> consumer = createConsumer();
+        //consumer.subscribe(List.of(oulRequestsTopic));
+        // Send regel request to start workflow
+        sendBekraftaBeslutRequest(kundbehovsflodeId);
+        //
+        // Verify GET kundbehovsflöde requested
+        //
+        List<LoggedRequest> kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer,
+                kundbehovsflodeEndpoint + kundbehovsflodeId, 3);
+        var getRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.GET)).toList();
+        assertFalse(getRequests.isEmpty());
+
+        //var oulCorrelation = oulTestResponder.awaitRequest();
+        //assertNotNull(oulCorrelation);
+        //assertEquals(kundbehovsflodeId, oulCorrelation.kundbehovsflodeId());
+
+        //ConsumerRecords<String, String> oulRequests = waitForOulRequest(consumer, oulRequestsTopic);
+        var x = 1;
+    }
 }

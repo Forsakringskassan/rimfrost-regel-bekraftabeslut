@@ -1,9 +1,11 @@
 package se.fk.github.bekraftabeslut.logic;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.runtime.Startup;
@@ -19,6 +21,7 @@ import se.fk.github.bekraftabeslut.integration.folkbokford.dto.ImmutableFolkbokf
 import se.fk.github.bekraftabeslut.integration.kafka.BekraftaBeslutKafkaProducer;
 import se.fk.github.bekraftabeslut.integration.kundbehovsflode.KundbehovsflodeAdapter;
 import se.fk.github.bekraftabeslut.integration.kundbehovsflode.dto.ImmutableKundbehovsflodeRequest;
+import se.fk.github.bekraftabeslut.logic.dto.*;
 import se.fk.github.bekraftabeslut.logic.entity.CloudEventData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableCloudEventData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableErsattningData;
@@ -27,24 +30,17 @@ import se.fk.github.bekraftabeslut.logic.entity.ImmutableUnderlag;
 import se.fk.github.bekraftabeslut.logic.entity.BekraftaBeslutData;
 import se.fk.rimfrost.Status;
 import se.fk.github.bekraftabeslut.logic.entity.ErsattningData;
-import se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall;
-import se.fk.github.bekraftabeslut.logic.dto.CreateBekraftaBeslutDataRequest;
-import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataRequest;
-import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
-import se.fk.github.bekraftabeslut.logic.dto.UpdateErsattningDataRequest;
-import se.fk.github.bekraftabeslut.logic.dto.UpdateBekraftaBeslutDataRequest;
-import se.fk.github.bekraftabeslut.logic.dto.UpdateStatusRequest;
-import se.fk.rimfrost.framework.integration.config.RegelConfigProvider;
+import se.fk.rimfrost.framework.integration.kafka.dto.ImmutableOulMessageRequest;
 import se.fk.rimfrost.framework.integration.config.RegelConfigProviderYaml;
 import se.fk.rimfrost.framework.integration.kafka.OulKafkaProducer;
 import se.fk.rimfrost.framework.integration.kafka.RegelKafkaProducer;
-import se.fk.rimfrost.framework.integration.kafka.dto.ImmutableOulMessageRequest;
 import se.fk.rimfrost.framework.logic.config.RegelConfig;
 import se.fk.rimfrost.framework.logic.dto.OulResponse;
 import se.fk.rimfrost.framework.logic.dto.OulStatus;
 import se.fk.rimfrost.framework.logic.dto.RegelDataRequest;
 import se.fk.rimfrost.framework.presentation.kafka.OulHandlerInterface;
 import se.fk.rimfrost.framework.presentation.kafka.RegelRequestHandlerInterface;
+import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.FSSAinformation;
 import se.fk.rimfrost.regel.common.Utfall;
 
 @ApplicationScoped
@@ -58,12 +54,13 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
    @Inject
    ObjectMapper objectMapper;
 
-   @Inject
-   BekraftaBeslutKafkaProducer kafkaProducer;
+//   @Inject
+//   BekraftaBeslutKafkaProducer kafkaProducer;
 
    @Inject
    RegelKafkaProducer regelKafkaProducer;
 
+   @Inject
    OulKafkaProducer oulKafkaProducer;
 
    @Inject
@@ -118,13 +115,13 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
    public void handleRegelRequest(RegelDataRequest request)
    {
       System.out.printf("HIT handleRegelRequest in BekraftaBeslutService%n%n");
-      System.out.printf("handleRegelRequest request.kundbehovsflodeId() =  %s%n", request.kundbehovsflodeId());
+      System.out.printf("HIT handleRegelRequest request.kundbehovsflodeId() =  %s%n", request.kundbehovsflodeId());
       var kundbehovsflodeRequest = ImmutableKundbehovsflodeRequest.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
             .build();
-      System.out.printf("handleRegelRequest 1%n");
+      System.out.printf("HIT handleRegelRequest 1%n");
       var kundbehovflodesResponse = kundbehovsflodeAdapter.getKundbehovsflodeInfo(kundbehovsflodeRequest);
-      System.out.printf("handleRegelRequest 2%n");
+      System.out.printf("HIT handleRegelRequest 2%n");
 
       var cloudeventData = ImmutableCloudEventData.builder()
             .id(request.id())
@@ -136,7 +133,7 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
             .kogitorootprocid(request.kogitorootprocid())
             .kogitorootprociid(request.kogitorootprociid())
             .build();
-      System.out.printf("handleRegelRequest 3%n");
+      System.out.printf("HIT handleRegelRequest 3%n");
 
       var ersattninglist = new ArrayList<ErsattningData>();
 
@@ -148,20 +145,23 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
          ersattninglist.add(ersattningData);
       }
 
-      System.out.printf("handleRegelRequest 4%n");
+      System.out.printf("HIT handleRegelRequest 4%n");
 
       var bekraftaBeslutData = ImmutableBekraftaBeslutData.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
             .uppgiftId(UUID.randomUUID())
             .cloudeventId(cloudeventData.id())
+            .skapadTs(OffsetDateTime.now())
+            .uppgiftStatus(UppgiftStatus.PLANERAD)
+            .fssaInformation(FSSAinformation.HANDLAGGNING_PAGAR)
             .ersattningar(ersattninglist)
             .underlag(new ArrayList<>())
             .build();
-      System.out.printf("handleRegelRequest 5%n");
+      System.out.printf("HIT handleRegelRequest 5%n");
 
       cloudevents.put(cloudeventData.id(), cloudeventData);
       bekraftaBeslutDatas.put(bekraftaBeslutData.kundbehovsflodeId(), bekraftaBeslutData);
-      System.out.printf("handleRegelRequest 6%n");
+      System.out.printf("HIT handleRegelRequest 6%n");
 
       var oulMessageRequest = ImmutableOulMessageRequest.builder()
             .kundbehovsflodeId(request.kundbehovsflodeId())
@@ -172,10 +172,10 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
             .roll(regelConfig.getSpecifikation().getRoll())
             .url("http://localhost:8888" + regelConfig.getUppgift().getPath() + "/" + request.kundbehovsflodeId().toString())
             .build();
-      System.out.printf("handleRegelRequest 7%n");
+      System.out.printf("HIT handleRegelRequest 7%n");
 
       oulKafkaProducer.sendOulRequest(oulMessageRequest);
-      System.out.printf("handleRegelRequest 8%n");
+      System.out.printf("HIT handleRegelRequest 8%n");
 
    }
 
