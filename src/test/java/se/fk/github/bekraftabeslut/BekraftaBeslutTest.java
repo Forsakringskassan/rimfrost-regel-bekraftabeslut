@@ -25,7 +25,10 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.spi.Connector;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -42,6 +45,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
@@ -295,12 +299,22 @@ class BekraftaBeslutTest
                 kundbehovsflodeEndpoint + kundbehovsflodeId, 3);
         var getRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.GET)).toList();
         assertFalse(getRequests.isEmpty());
+        //
+        // Verify oul message produced
+        //
+        await().atMost(5, TimeUnit.SECONDS).until(() ->
+               !inMemoryConnector.sink(oulRequestsTopic).received().isEmpty());
+        List<? extends Message<?>> messages = inMemoryConnector.sink(oulRequestsTopic).received();
+        assertEquals(1, messages.size());
+        var oulRequestMessage = (OperativtUppgiftslagerRequestMessage) messages.getFirst().getPayload();
+        assertEquals("Bekräfta beslut", oulRequestMessage.getBeskrivning());
+        assertEquals(kundbehovsflodeId, oulRequestMessage.getKundbehovsflodeId());
+        //
+        // Verify PUT kundbehovsflöde requested
+        //
+        kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 3);
+        var putRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
 
-        //var oulCorrelation = oulTestResponder.awaitRequest();
-        //assertNotNull(oulCorrelation);
-        //assertEquals(kundbehovsflodeId, oulCorrelation.kundbehovsflodeId());
-
-        //ConsumerRecords<String, String> oulRequests = waitForOulRequest(consumer, oulRequestsTopic);
         var x = 1;
     }
 }
