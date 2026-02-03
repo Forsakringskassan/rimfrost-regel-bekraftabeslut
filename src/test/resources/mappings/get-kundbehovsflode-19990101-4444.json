@@ -1,0 +1,69 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/kundbehovsflode/.+4444$"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "BREADCRUMB-ID": "test-breadcrumb",
+      "PROCESSID": "test-process"
+    },
+    "jsonBody": {
+      "kundbehovsflode": {
+        "id": "5367f6b8-cc4a-11f0-8de9-199901014444",
+        "processinstansId": "e7f3c5a2-1234-4abc-9876-56789abcdef0",
+        "version": "1.0",
+        "kundbehov": {
+          "id": "81234d56-7890-4abc-1234-56789abcdef0",
+          "formanstyp": "VAH",
+          "version": "1.0",
+          "kundbehovsdatum": "2025-12-01T12:00:00Z",
+          "kundbehovsstatus": "PLANERAT",
+          "period": {
+            "start": "2025-01-01T00:00:00Z",
+            "slut": "2025-12-31T23:59:59Z"
+          },
+          "avsikt": "NY",
+          "kundbehovsroll": [
+            {
+              "id": "91234567-89ab-4cde-9012-3456789abcde",
+              "individ": {
+                "id": "19990101-4444",
+                "fornamn": "Loke",
+                "efternamn": "Tass"
+              },
+              "roll": "AGARE",
+              "yrkande": true
+            }
+          ],
+          "ersattning": []
+        },
+        "skapadTS": "2025-12-01T12:01:00Z",
+        "avslutadTS": null,
+        "kundbehovsspecifikation": {
+          "id": "71234567-89ab-4cde-9012-3456789abcde",
+          "version": "1.0",
+          "bpmn": "processA",
+          "namn": "Specifikation A",
+          "beskrivning": "Exempel på kundbehovsspecifikation",
+          "uppgiftspecifikation": [
+            {
+              "id": "61234567-89ab-4cde-9012-3456789abcde",
+              "version": "1.0",
+              "namn": "Uppgift 1",
+              "uppgiftbeskrivning": "Beskrivning av uppgift 1",
+              "verksamhetslogik": "A",
+              "roll": "AGARE",
+              "applikationsId": "app123",
+              "applikationsVersion": "1.0",
+              "regel": [],
+              "uppgiftsGui": "GUI1"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

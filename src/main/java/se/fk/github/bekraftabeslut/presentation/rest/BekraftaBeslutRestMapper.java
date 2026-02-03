@@ -1,7 +1,6 @@
 package se.fk.github.bekraftabeslut.presentation.rest;
 
 import java.util.UUID;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.ImmutableUpdateErsattningDataRequest;
@@ -76,44 +75,27 @@ public class BekraftaBeslutRestMapper
 
    private Beslutsutfall mapBeslutsutfall(se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall beslututfall)
    {
-      switch (beslututfall)
-      {
-         case JA:
-            return Beslutsutfall.JA;
-         case NEJ:
-            return Beslutsutfall.NEJ;
-         case FU:
-            return Beslutsutfall.FU;
-         default:
-            return null;
-      }
+       return switch (beslututfall) {
+           case JA -> Beslutsutfall.JA;
+           case NEJ -> Beslutsutfall.NEJ;
+           case FU -> Beslutsutfall.FU;
+           default -> null;
+       };
    }
 
    private se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall mapBeslutsutfall(Beslutsutfall beslututfall)
    {
-      switch (beslututfall)
-      {
-         case JA:
-            return se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.JA;
-         case NEJ:
-            return se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.NEJ;
-         case FU:
-            return se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.FU;
-         default:
-            return null;
-      }
+       return switch (beslututfall) {
+           case JA -> se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.JA;
+           case NEJ -> se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.NEJ;
+           case FU -> se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.FU;
+           default -> null;
+       };
    }
 
    private KonEnum mapKonEnum(String kon)
    {
-      switch (kon)
-      {
-         case "Man":
-            return KonEnum.MAN;
-         default:
-         case "KVINNA":
-            return KonEnum.KVINNA;
-      }
+      return switch(kon){case"Man"->KonEnum.MAN;default->KonEnum.KVINNA;};
    }
 
 }

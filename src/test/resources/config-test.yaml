@@ -1,0 +1,6 @@
+uppgift:
+  namn: TestUppgiftNamn
+  beskrivning: TestUppgiftBeskrivning
+  verksamhetslogik: TestUppgiftVerksamhetslogik
+  roll: TestUppgiftRoll
+  path: /regel/bekraftabeslut

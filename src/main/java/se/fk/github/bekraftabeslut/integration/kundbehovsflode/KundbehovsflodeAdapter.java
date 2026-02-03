@@ -1,7 +1,6 @@
 package se.fk.github.bekraftabeslut.integration.kundbehovsflode;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -22,27 +21,33 @@ public class KundbehovsflodeAdapter
    @Inject
    KundbehovsflodeMapper mapper;
 
-   private KundbehovsflodeControllerApi kundbehovsClient;
+   private KundbehovsflodeControllerApi kundbehovsflodeClient;
 
    @PostConstruct
    void init()
    {
-      this.kundbehovsClient = new JaxrsClientFactory()
+      this.kundbehovsflodeClient = new JaxrsClientFactory()
             .create(JaxrsClientOptionsBuilders.createClient(kundbehovsflodeBaseUrl, KundbehovsflodeControllerApi.class)
                   .build());
    }
 
    public KundbehovsflodeResponse getKundbehovsflodeInfo(KundbehovsflodeRequest kundbehovsflodeRequest)
    {
-      var apiResponse = kundbehovsClient.getKundbehovsflode(kundbehovsflodeRequest.kundbehovsflodeId());
-      return mapper.toKundbehovsflodeResponse(apiResponse);
+      try
+      {
+         var apiResponse = kundbehovsflodeClient.getKundbehovsflode(kundbehovsflodeRequest.kundbehovsflodeId());
+         return mapper.toKundbehovsflodeResponse(apiResponse);
+      }
+      catch (Exception e)
+      {
+         throw new RuntimeException("Failed getKundbehovsflodeInfo", e);
+      }
    }
 
    public void updateKundbehovsflodeInfo(UpdateKundbehovsflodeRequest request)
    {
-      var apiResponse = kundbehovsClient.getKundbehovsflode(request.kundbehovsflodeId());
-
+      var apiResponse = kundbehovsflodeClient.getKundbehovsflode(request.kundbehovsflodeId());
       var apiRequest = mapper.toApiRequest(request, apiResponse);
-      kundbehovsClient.putKundbehovsflode(request.kundbehovsflodeId(), apiRequest);
+      kundbehovsflodeClient.putKundbehovsflode(request.kundbehovsflodeId(), apiRequest);
    }
 }
