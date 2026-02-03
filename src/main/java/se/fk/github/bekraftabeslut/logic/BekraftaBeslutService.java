@@ -189,7 +189,6 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
 
    public void updateErsattningData(UpdateErsattningDataRequest updateRequest)
    {
-      System.out.printf("HIT updateErsattningData%n");
       var bekraftaBeslutData = bekraftaBeslutDatas.get(updateRequest.kundbehovsflodeId());
 
       var existingErsattning = bekraftaBeslutData.ersattningar().stream()
@@ -232,7 +231,6 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
    private void updateBekraftaBeslutDataUnderlag(BekraftaBeslutData bekraftaBeslutData, FolkbokfordResponse folkbokfordResponse,
          ArbetsgivareResponse arbetsgivareResponse) throws JsonProcessingException
    {
-      System.out.printf("HIT updateBekraftaBeslutDataUnderlag%n");
 
       var bekraftaBeslutDataBuilder = ImmutableBekraftaBeslutData.builder().from(bekraftaBeslutData);
 
@@ -262,9 +260,7 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
    private void updateKundbehovsflodeInfo(BekraftaBeslutData bekraftaBeslutData)
    {
       var request = bekraftaBeslutMapper.toUpdateKundbehovsflodeRequest(bekraftaBeslutData, regelConfigProvider.getConfig());
-      System.out.printf("service: updateKundbehovsflodeInfo 1%n");
       kundbehovsflodeAdapter.updateKundbehovsflodeInfo(request);
-      System.out.printf("service: updateKundbehovsflodeInfo 2%n");
 
    }
 

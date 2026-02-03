@@ -6,13 +6,14 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.restassured.http.ContentType;
 import io.smallrye.reactive.messaging.memory.InMemoryConnector;
 import jakarta.inject.Inject;
+
 import java.net.http.HttpClient;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static io.restassured.RestAssured.*;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -24,12 +25,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.testcontainers.containers.Network;
 import se.fk.rimfrost.OperativtUppgiftslagerRequestMessage;
 import se.fk.rimfrost.OperativtUppgiftslagerResponseMessage;
 import se.fk.rimfrost.OperativtUppgiftslagerStatusMessage;
 import se.fk.rimfrost.Status;
-import se.fk.rimfrost.framework.regel.integration.kafka.dto.RegelResponse;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutKundbehovsflodeRequest;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
@@ -59,18 +58,20 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 class BekraftaBeslutTest
 {
 
-   String oulRequestsChannel = "operativt-uppgiftslager-requests";
-   String oulResponsesChannel = "operativt-uppgiftslager-responses";
-   String oulStatusNotificationChannel = "operativt-uppgiftslager-status-notification";
-   String oulStatusControlChannel = "operativt-uppgiftslager-status-control";
-   String regelResponsesChannel = "regel-responses";
+   private static final String oulRequestsChannel = "operativt-uppgiftslager-requests";
+   private static final String oulResponsesChannel = "operativt-uppgiftslager-responses";
+   private static final String oulStatusNotificationChannel = "operativt-uppgiftslager-status-notification";
+   private static final String oulStatusControlChannel = "operativt-uppgiftslager-status-control";
+   private static final String regelRequestsChannel = "regel-requests";
+   private static final String regelResponsesChannel = "regel-responses";
+   private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+   private static final String kundbehovsflodeEndpoint = "/kundbehovsflode/";
+   private static final HttpClient httpClient = HttpClient.newHttpClient();
 
    private static WireMockServer wiremockServer;
 
    private static final HttpClient http = HttpClient.newHttpClient();
-
-   //   @Inject
-   //    OulTestResponder oulTestResponder;
 
    @BeforeAll
    static void setup()
@@ -85,7 +86,7 @@ class BekraftaBeslutTest
             .get("/q/health/live")
             .then()
             .statusCode(200)
-            .body("status", is("UP")); // JSON returned: {"status":"UP"}
+            .body("status", is("UP"));
    }
 
    static void setupWiremock()
@@ -96,19 +97,6 @@ class BekraftaBeslutTest
    @Inject
    @Connector("smallrye-in-memory")
    InMemoryConnector inMemoryConnector;
-
-   private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
-         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-   private static final String bekraftaBeslutRequestsTopic = TestConfig.get("bekraftabeslut.requests.topic");
-   private static final String bekraftaBeslutResponsesTopic = TestConfig.get("bekraftabeslut.responses.topic");
-   private static final String oulStatusNotificationTopic = TestConfig.get("oul.status-notification.topic");
-   private static final String oulStatusControlTopic = TestConfig.get("oul.status-control.topic");
-   private static final String networkAlias = TestConfig.get("network.alias");
-   private static final String smallryeKafkaBootstrapServers = networkAlias + ":9092";
-   private static final Network network = Network.newNetwork();
-   private static final String wiremockUrl = "http://wiremock:8080";
-   private static final String kundbehovsflodeEndpoint = "/kundbehovsflode/";
-   private static final HttpClient httpClient = HttpClient.newHttpClient();
 
    public static List<LoggedRequest> waitForWireMockRequest(
          WireMockServer server,
@@ -135,7 +123,7 @@ class BekraftaBeslutTest
             throw new RuntimeException("Interrupted while waiting for WireMock request", e);
          }
       }
-      return requests; // empty if nothing received
+      return requests;
    }
 
    private void sendBekraftaBeslutRequest(String kundbehovsflodeId) throws Exception
@@ -146,7 +134,7 @@ class BekraftaBeslutTest
       payload.setSpecversion(se.fk.rimfrost.regel.common.SpecVersion.NUMBER_1_DOT_0);
       payload.setId("99994567-89ab-4cde-9012-3456789abcde");
       payload.setSource("TestSource-001");
-      payload.setType(bekraftaBeslutRequestsTopic);
+      payload.setType(regelRequestsChannel);
       payload.setKogitoprocid("234567");
       payload.setKogitorootprocid("123456");
       payload.setKogitorootprociid("77774567-89ab-4cde-9012-3456789abcde");
@@ -157,15 +145,7 @@ class BekraftaBeslutTest
       payload.setKogitoproctype(se.fk.rimfrost.regel.common.KogitoProcType.BPMN);
       payload.setKogitoprocrefid("56789");
       payload.setData(data);
-      inMemoryConnector.source("regel-requests").send(payload);
-   }
-
-   private void sendOulStatus(String kundbehovsflodeId, String uppgiftId, Status status) throws Exception
-   {
-      OperativtUppgiftslagerStatusMessage statusMessage = new OperativtUppgiftslagerStatusMessage();
-      statusMessage.setStatus(status);
-      statusMessage.setUppgiftId(uppgiftId);
-      statusMessage.setKundbehovsflodeId(kundbehovsflodeId);
+      inMemoryConnector.source(regelRequestsChannel).send(payload);
    }
 
    static void setupBekraftaBeslutTest()
@@ -183,6 +163,31 @@ class BekraftaBeslutTest
       {
          throw new RuntimeException("Failed to load test.properties", e);
       }
+   }
+
+   private List<? extends Message<?>> waitForMessages(String channel)
+   {
+      await().atMost(5, TimeUnit.SECONDS).until(() -> !inMemoryConnector.sink(channel).received().isEmpty());
+      return inMemoryConnector.sink(channel).received();
+   }
+
+   private GetDataResponse sendGetBekraftaBeslut(String kundbehovsflodeId)
+   {
+      return given().when().get("/regel/bekrafta-beslut/{kundbehovsflodeId}", kundbehovsflodeId).then().statusCode(200).extract()
+            .as(GetDataResponse.class);
+   }
+
+   private void sendPatchBekraftaBeslut(String kundbehovsflodeId, PatchDataRequest patchDataRequest)
+   {
+      given().contentType(ContentType.JSON).body(patchDataRequest).when()
+            .patch("/regel/bekrafta-beslut/{kundbehovsflodeId}/ersattning/{ersattningId}", kundbehovsflodeId,
+                  patchDataRequest.getErsattningId())
+            .then().statusCode(204);
+   }
+
+   private void sendPostBekraftaBeslut(String kundbehovsflodeId)
+   {
+      given().when().post("/regel/bekrafta-beslut/{kundbehovsflodeId}/done", kundbehovsflodeId).then().statusCode(204);
    }
 
    @ParameterizedTest
@@ -205,8 +210,7 @@ class BekraftaBeslutTest
       //
       // Verify oul message produced
       //
-      await().atMost(5, TimeUnit.SECONDS).until(() -> !inMemoryConnector.sink(oulRequestsChannel).received().isEmpty());
-      List<? extends Message<?>> messages = inMemoryConnector.sink(oulRequestsChannel).received();
+      var messages = waitForMessages(oulRequestsChannel);
       assertEquals(1, messages.size());
       var oulRequestMessage = (OperativtUppgiftslagerRequestMessage) messages.getFirst().getPayload();
       assertEquals("Bekräfta beslut", oulRequestMessage.getBeskrivning());
@@ -277,40 +281,19 @@ class BekraftaBeslutTest
       //
       // verify kafka status message sent to oul
       //
-      await().atMost(5, TimeUnit.SECONDS).until(() -> !inMemoryConnector.sink(oulStatusControlChannel).received().isEmpty());
-      messages = inMemoryConnector.sink(oulStatusControlChannel).received();
+      messages = waitForMessages(oulStatusControlChannel);
       assertEquals(1, messages.size());
       oulStatusMessage = (OperativtUppgiftslagerStatusMessage) messages.getFirst().getPayload();
-
       assertEquals(oulResponseMessage.getUppgiftId(), oulStatusMessage.getUppgiftId());
       assertEquals(Status.AVSLUTAD, oulStatusMessage.getStatus());
       //
       // verify kafka response message sent to VAH
       //
-      await().atMost(5, TimeUnit.SECONDS).until(() -> !inMemoryConnector.sink(regelResponsesChannel).received().isEmpty());
-      messages = inMemoryConnector.sink(regelResponsesChannel).received();
+      messages = waitForMessages(regelResponsesChannel);
       assertEquals(1, messages.size());
       var regelResponseMessagePayload = (RegelResponseMessagePayload) messages.getFirst().getPayload();
       assertEquals(kundbehovsflodeId, regelResponseMessagePayload.getData().getKundbehovsflodeId());
       assertEquals(Utfall.JA, regelResponseMessagePayload.getData().getUtfall());
    }
 
-   private GetDataResponse sendGetBekraftaBeslut(String kundbehovsflodeId)
-   {
-      return given().when().get("/regel/bekrafta-beslut/{kundbehovsflodeId}", kundbehovsflodeId).then().statusCode(200).extract()
-            .as(GetDataResponse.class);
-   }
-
-   private void sendPatchBekraftaBeslut(String kundbehovsflodeId, PatchDataRequest patchDataRequest)
-   {
-      given().contentType(ContentType.JSON).body(patchDataRequest).when()
-            .patch("/regel/bekrafta-beslut/{kundbehovsflodeId}/ersattning/{ersattningId}", kundbehovsflodeId,
-                  patchDataRequest.getErsattningId())
-            .then().statusCode(204);
-   }
-
-   private void sendPostBekraftaBeslut(String kundbehovsflodeId)
-   {
-      given().when().post("/regel/bekrafta-beslut/{kundbehovsflodeId}/done", kundbehovsflodeId).then().statusCode(204);
-   }
 }
