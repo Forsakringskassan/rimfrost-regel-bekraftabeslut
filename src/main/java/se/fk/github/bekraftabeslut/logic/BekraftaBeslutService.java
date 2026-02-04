@@ -18,9 +18,9 @@ import se.fk.github.bekraftabeslut.integration.arbetsgivare.dto.ImmutableArbetsg
 import se.fk.github.bekraftabeslut.integration.folkbokford.FolkbokfordAdapter;
 import se.fk.github.bekraftabeslut.integration.folkbokford.dto.FolkbokfordResponse;
 import se.fk.github.bekraftabeslut.integration.folkbokford.dto.ImmutableFolkbokfordRequest;
-import se.fk.github.bekraftabeslut.integration.kundbehovsflode.KundbehovsflodeAdapter;
-import se.fk.github.bekraftabeslut.integration.kundbehovsflode.dto.ImmutableKundbehovsflodeRequest;
-import se.fk.github.bekraftabeslut.logic.dto.*;
+import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataRequest;
+import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
+import se.fk.github.bekraftabeslut.logic.dto.UpdateErsattningDataRequest;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableErsattningData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableBekraftaBeslutData;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableUnderlag;
@@ -32,16 +32,20 @@ import se.fk.rimfrost.framework.oul.integration.kafka.dto.ImmutableOulMessageReq
 import se.fk.rimfrost.framework.oul.logic.dto.OulResponse;
 import se.fk.rimfrost.framework.oul.logic.dto.OulStatus;
 import se.fk.rimfrost.framework.oul.presentation.kafka.OulHandlerInterface;
+import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.integration.config.RegelConfigProviderYaml;
 import se.fk.rimfrost.framework.regel.integration.kafka.RegelKafkaProducer;
+import se.fk.rimfrost.framework.regel.integration.kundbehovsflode.KundbehovsflodeAdapter;
+import se.fk.rimfrost.framework.regel.integration.kundbehovsflode.dto.ImmutableKundbehovsflodeRequest;
 import se.fk.rimfrost.framework.regel.logic.RegelMapper;
 import se.fk.rimfrost.framework.regel.logic.config.RegelConfig;
+import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
 import se.fk.rimfrost.framework.regel.logic.dto.RegelDataRequest;
+import se.fk.rimfrost.framework.regel.logic.dto.UppgiftStatus;
 import se.fk.rimfrost.framework.regel.logic.entity.CloudEventData;
 import se.fk.rimfrost.framework.regel.logic.entity.ImmutableCloudEventData;
 import se.fk.rimfrost.framework.regel.presentation.kafka.RegelRequestHandlerInterface;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.FSSAinformation;
-import se.fk.rimfrost.regel.common.Utfall;
 
 @ApplicationScoped
 @Startup

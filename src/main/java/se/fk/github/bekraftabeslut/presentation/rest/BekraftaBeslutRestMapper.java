@@ -5,8 +5,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.ImmutableUpdateErsattningDataRequest;
 import se.fk.github.bekraftabeslut.logic.dto.UpdateErsattningDataRequest;
+import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Anstallning;
-import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Ersattning;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Kund;
@@ -73,7 +73,8 @@ public class BekraftaBeslutRestMapper
             .build();
    }
 
-   private Beslutsutfall mapBeslutsutfall(se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall beslututfall)
+   private se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall mapBeslutsutfall(
+         se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall beslututfall)
    {
        return switch (beslututfall) {
            case JA -> Beslutsutfall.JA;
@@ -83,12 +84,16 @@ public class BekraftaBeslutRestMapper
        };
    }
 
-   private se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall mapBeslutsutfall(Beslutsutfall beslututfall)
+   private se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall mapBeslutsutfall(
+         se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall beslututfall)
    {
        return switch (beslututfall) {
-           case JA -> se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.JA;
-           case NEJ -> se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.NEJ;
-           case FU -> se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall.FU;
+           case JA ->
+                   se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall.JA;
+           case NEJ ->
+                   se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall.NEJ;
+           case FU ->
+                   se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall.FU;
            default -> null;
        };
    }

@@ -5,22 +5,18 @@ import java.util.ArrayList;
 import jakarta.enterprise.context.ApplicationScoped;
 import se.fk.github.bekraftabeslut.integration.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.github.bekraftabeslut.integration.folkbokford.dto.FolkbokfordResponse;
-import se.fk.github.bekraftabeslut.integration.kundbehovsflode.dto.*;
 import se.fk.github.bekraftabeslut.logic.dto.ImmutableErsattning;
 import se.fk.github.bekraftabeslut.logic.dto.ImmutableGetBekraftaBeslutDataResponse;
-import se.fk.github.bekraftabeslut.logic.dto.Beslutsutfall;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse.Ersattning;
 import se.fk.github.bekraftabeslut.logic.entity.ErsattningData;
 import se.fk.github.bekraftabeslut.logic.entity.BekraftaBeslutData;
-import se.fk.rimfrost.framework.regel.integration.kafka.dto.ImmutableRegelResponse;
-import se.fk.rimfrost.framework.regel.integration.kafka.dto.RegelResponse;
+import se.fk.rimfrost.framework.regel.integration.kundbehovsflode.dto.*;
 import se.fk.rimfrost.framework.regel.logic.config.RegelConfig;
-import se.fk.rimfrost.framework.regel.logic.entity.CloudEventData;
+import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.Ersattning.BeslutsutfallEnum;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.Roll;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.Verksamhetslogik;
-import se.fk.rimfrost.regel.common.Utfall;
 
 @ApplicationScoped
 public class BekraftaBeslutMapper
@@ -82,23 +78,6 @@ public class BekraftaBeslutMapper
                .organisationsnummer(arbetsgivareResponse.organisationsnummer());
       }
       return builder.build();
-   }
-
-   public RegelResponse toRegelResponse(BekraftaBeslutData bekraftaBeslutData,
-         CloudEventData cloudevent, Utfall utfall)
-   {
-      return ImmutableRegelResponse.builder()
-            .id(cloudevent.id())
-            .kundbehovsflodeId(bekraftaBeslutData.kundbehovsflodeId())
-            .kogitoparentprociid(cloudevent.kogitoparentprociid())
-            .kogitorootprociid(cloudevent.kogitorootprociid())
-            .kogitoprocid(cloudevent.kogitoprocid())
-            .kogitorootprocid(cloudevent.kogitorootprocid())
-            .kogitoprocinstanceid(cloudevent.kogitoprocinstanceid())
-            .kogitoprocist(cloudevent.kogitoprocist())
-            .kogitoprocversion(cloudevent.kogitoprocversion())
-            .utfall(utfall)
-            .build();
    }
 
    public UpdateKundbehovsflodeRequest toUpdateKundbehovsflodeRequest(BekraftaBeslutData bekraftaBeslutData,
