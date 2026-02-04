@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import org.immutables.value.Value;
 import jakarta.annotation.Nullable;
+import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
 
 @Value.Immutable
 public interface GetBekraftaBeslutDataResponse
@@ -39,7 +40,7 @@ public interface GetBekraftaBeslutDataResponse
    List<Ersattning> ersattning();
 
    @Value.Immutable
-   public interface Ersattning
+   interface Ersattning
    {
 
       UUID ersattningsId();

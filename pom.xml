@@ -79,9 +79,9 @@
       <version>0.0.2</version>
     </dependency>
     <dependency>
-      <groupId>se.fk.rimfrost.regel.common</groupId>
-      <artifactId>rimfrost-regel-common-asyncapi</artifactId>
-      <version>0.2.1</version>
+      <groupId>se.fk.rimfrost.framework.regel</groupId>
+      <artifactId>rimfrost-framework-regel-asyncapi</artifactId>
+      <version>0.0.0</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.regel.common</groupId>
@@ -121,7 +121,7 @@
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel</groupId>
       <artifactId>rimfrost-framework-regel</artifactId>
-      <version>0.0.4</version>
+      <version>0.1.2</version>
     </dependency>
   </dependencies>
 

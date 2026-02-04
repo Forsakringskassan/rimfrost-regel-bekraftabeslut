@@ -6,14 +6,11 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.restassured.http.ContentType;
 import io.smallrye.reactive.messaging.memory.InMemoryConnector;
 import jakarta.inject.Inject;
-
 import java.net.http.HttpClient;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -29,15 +26,14 @@ import se.fk.rimfrost.OperativtUppgiftslagerRequestMessage;
 import se.fk.rimfrost.OperativtUppgiftslagerResponseMessage;
 import se.fk.rimfrost.OperativtUppgiftslagerStatusMessage;
 import se.fk.rimfrost.Status;
+import se.fk.rimfrost.framework.regel.RegelRequestMessagePayload;
+import se.fk.rimfrost.framework.regel.RegelRequestMessagePayloadData;
+import se.fk.rimfrost.framework.regel.RegelResponseMessagePayload;
+import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutKundbehovsflodeRequest;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
-import se.fk.rimfrost.regel.common.RegelRequestMessagePayload;
-import se.fk.rimfrost.regel.common.RegelRequestMessagePayloadData;
-import se.fk.rimfrost.regel.common.RegelResponseMessagePayload;
-import se.fk.rimfrost.regel.common.Utfall;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -45,7 +41,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
@@ -67,11 +62,7 @@ class BekraftaBeslutTest
    private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
          .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
    private static final String kundbehovsflodeEndpoint = "/kundbehovsflode/";
-   private static final HttpClient httpClient = HttpClient.newHttpClient();
-
    private static WireMockServer wiremockServer;
-
-   private static final HttpClient http = HttpClient.newHttpClient();
 
    @BeforeAll
    static void setup()
@@ -131,7 +122,7 @@ class BekraftaBeslutTest
       RegelRequestMessagePayload payload = new RegelRequestMessagePayload();
       RegelRequestMessagePayloadData data = new RegelRequestMessagePayloadData();
       data.setKundbehovsflodeId(kundbehovsflodeId);
-      payload.setSpecversion(se.fk.rimfrost.regel.common.SpecVersion.NUMBER_1_DOT_0);
+      payload.setSpecversion(se.fk.rimfrost.framework.regel.SpecVersion.NUMBER_1_DOT_0);
       payload.setId("99994567-89ab-4cde-9012-3456789abcde");
       payload.setSource("TestSource-001");
       payload.setType(regelRequestsChannel);
@@ -142,7 +133,7 @@ class BekraftaBeslutTest
       payload.setKogitoprocinstanceid("66664567-89ab-4cde-9012-3456789abcde");
       payload.setKogitoprocist("345678");
       payload.setKogitoprocversion("111");
-      payload.setKogitoproctype(se.fk.rimfrost.regel.common.KogitoProcType.BPMN);
+      payload.setKogitoproctype(se.fk.rimfrost.framework.regel.KogitoProcType.BPMN);
       payload.setKogitoprocrefid("56789");
       payload.setData(data);
       inMemoryConnector.source(regelRequestsChannel).send(payload);
