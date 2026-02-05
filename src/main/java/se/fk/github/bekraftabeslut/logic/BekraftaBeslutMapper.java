@@ -9,11 +9,11 @@ import se.fk.github.bekraftabeslut.logic.dto.ImmutableErsattning;
 import se.fk.github.bekraftabeslut.logic.dto.ImmutableGetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse.Ersattning;
-import se.fk.github.bekraftabeslut.logic.entity.ErsattningData;
-import se.fk.github.bekraftabeslut.logic.entity.BekraftaBeslutData;
 import se.fk.rimfrost.framework.regel.integration.kundbehovsflode.dto.*;
 import se.fk.rimfrost.framework.regel.logic.config.RegelConfig;
 import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
+import se.fk.rimfrost.framework.regel.logic.entity.ErsattningData;
+import se.fk.rimfrost.framework.regel.logic.entity.RegelData;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.Ersattning.BeslutsutfallEnum;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.Roll;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.Verksamhetslogik;
@@ -24,13 +24,13 @@ public class BekraftaBeslutMapper
 
    public GetBekraftaBeslutDataResponse toBekraftaBeslutResponse(KundbehovsflodeResponse kundbehovflodesResponse,
          FolkbokfordResponse folkbokfordResponse, ArbetsgivareResponse arbetsgivareResponse,
-         BekraftaBeslutData bekraftaBeslutData)
+         RegelData regelData)
    {
       var ersattningsList = new ArrayList<Ersattning>();
 
       for (var kundbehovErsattning : kundbehovflodesResponse.ersattning())
       {
-         ErsattningData bekraftaBeslutErsattning = bekraftaBeslutData.ersattningar().stream()
+         ErsattningData bekraftaBeslutErsattning = regelData.ersattningar().stream()
                .filter(e -> e.id().equals(kundbehovErsattning.ersattningsId()))
                .findFirst()
                .orElseThrow(() -> new IllegalArgumentException("ErsattningData not found"));
@@ -80,7 +80,7 @@ public class BekraftaBeslutMapper
       return builder.build();
    }
 
-   public UpdateKundbehovsflodeRequest toUpdateKundbehovsflodeRequest(BekraftaBeslutData bekraftaBeslutData,
+   public UpdateKundbehovsflodeRequest toUpdateKundbehovsflodeRequest(RegelData regelData,
          RegelConfig regelConfig)
    {
 
@@ -117,24 +117,24 @@ public class BekraftaBeslutMapper
             .build();
 
       var uppgift = ImmutableUpdateKundbehovsflodeUppgift.builder()
-            .id(bekraftaBeslutData.uppgiftId())
+            .id(regelData.uppgiftId())
             .version(regelConfig.getUppgift().getVersion())
-            .skapadTs(bekraftaBeslutData.skapadTs())
-            .utfordTs(bekraftaBeslutData.utfordTs())
-            .planeradTs(bekraftaBeslutData.planeradTs())
-            .utforarId(bekraftaBeslutData.utforarId())
-            .uppgiftStatus(bekraftaBeslutData.uppgiftStatus())
+            .skapadTs(regelData.skapadTs())
+            .utfordTs(regelData.utfordTs())
+            .planeradTs(regelData.planeradTs())
+            .utforarId(regelData.utforarId())
+            .uppgiftStatus(regelData.uppgiftStatus())
             .aktivitet(regelConfig.getUppgift().getAktivitet())
-            .fsSAinformation(bekraftaBeslutData.fssaInformation())
+            .fsSAinformation(regelData.fssaInformation())
             .specifikation(specifikation)
             .build();
 
       var requestBuilder = ImmutableUpdateKundbehovsflodeRequest.builder()
-            .kundbehovsflodeId(bekraftaBeslutData.kundbehovsflodeId())
+            .kundbehovsflodeId(regelData.kundbehovsflodeId())
             .uppgift(uppgift)
             .underlag(new ArrayList<UpdateKundbehovsflodeUnderlag>());
 
-      for (ErsattningData rtfErsattning : bekraftaBeslutData.ersattningar())
+      for (ErsattningData rtfErsattning : regelData.ersattningar())
       {
          var ersattning = ImmutableUpdateKundbehovsflodeErsattning.builder()
                .beslutsutfall(mapBeslutsutfall(rtfErsattning.beslutsutfall()))
@@ -144,7 +144,7 @@ public class BekraftaBeslutMapper
          requestBuilder.addErsattningar(ersattning);
       }
 
-      for (var rtfUnderlag : bekraftaBeslutData.underlag())
+      for (var rtfUnderlag : regelData.underlag())
       {
          var underlag = ImmutableUpdateKundbehovsflodeUnderlag.builder()
                .typ(rtfUnderlag.typ())

@@ -56,4 +56,5 @@ public class BekraftaBeslutController extends OulController implements RegelBekr
       var request = mapper.toUpdateErsattningDataRequest(kundbehovsflodeId, patchRequest);
       bekraftaBeslutService.updateErsattningData(request);
    }
+
 }
