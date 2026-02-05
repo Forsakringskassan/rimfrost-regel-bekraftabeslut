@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.immutables.value.Value;
 import jakarta.annotation.Nullable;
 import se.fk.rimfrost.framework.regel.logic.dto.UppgiftStatus;
+import se.fk.rimfrost.framework.regel.logic.entity.ErsattningData;
+import se.fk.rimfrost.framework.regel.logic.entity.Underlag;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.FSSAinformation;
 
 @Value.Immutable
