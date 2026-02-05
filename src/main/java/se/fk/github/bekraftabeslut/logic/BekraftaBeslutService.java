@@ -1,6 +1,5 @@
 package se.fk.github.bekraftabeslut.logic;
 
-import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.runtime.Startup;
@@ -15,18 +14,13 @@ import se.fk.github.bekraftabeslut.integration.folkbokford.dto.ImmutableFolkbokf
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataRequest;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.UpdateErsattningDataRequest;
-import se.fk.rimfrost.Status;
-import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.integration.kundbehovsflode.dto.ImmutableKundbehovsflodeRequest;
-import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
-import se.fk.rimfrost.framework.regel.logic.dto.UppgiftStatus;
 import se.fk.rimfrost.framework.regel.logic.entity.*;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellService;
-import se.fk.rimfrost.framework.oul.presentation.rest.OulUppgiftDoneHandler;
 
 @ApplicationScoped
 @Startup
-public class BekraftaBeslutService extends RegelManuellService implements OulUppgiftDoneHandler
+public class BekraftaBeslutService extends RegelManuellService
 {
 
    @Inject
@@ -125,26 +119,4 @@ public class BekraftaBeslutService extends RegelManuellService implements OulUpp
       regelDatas.put(regelData.kundbehovsflodeId(), regelDataBuilder.build());
    }
 
-   @Override
-   public void handleUppgiftDone(UUID kundbehovsflodeId)
-   {
-      var regelData = regelDatas.get(kundbehovsflodeId);
-
-      var updatedRegelDataBuilder = ImmutableRegelData.builder()
-            .from(regelData);
-
-      updatedRegelDataBuilder.uppgiftStatus(UppgiftStatus.AVSLUTAD);
-
-      var updatedRegelData = updatedRegelDataBuilder.build();
-      regelDatas.put(kundbehovsflodeId, updatedRegelData);
-
-      var utfall = regelData.ersattningar().stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA) ? Utfall.JA
-            : Utfall.NEJ;
-      var cloudevent = cloudevents.get(updatedRegelData.cloudeventId());
-      var regelResponse = regelMapper.toRegelResponse(kundbehovsflodeId, cloudevent, utfall);
-      oulKafkaProducer.sendOulStatusUpdate(updatedRegelData.uppgiftId(), Status.AVSLUTAD);
-      regelKafkaProducer.sendRegelResponse(regelResponse);
-
-      updateKundbehovsflodeInfo(updatedRegelData);
-   }
 }
