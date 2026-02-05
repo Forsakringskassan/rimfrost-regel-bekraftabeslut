@@ -16,9 +16,6 @@ import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataRequest;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.UpdateErsattningDataRequest;
 import se.fk.rimfrost.Status;
-import se.fk.rimfrost.framework.oul.logic.dto.OulResponse;
-import se.fk.rimfrost.framework.oul.logic.dto.OulStatus;
-import se.fk.rimfrost.framework.oul.presentation.kafka.OulHandlerInterface;
 import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.integration.kundbehovsflode.dto.ImmutableKundbehovsflodeRequest;
 import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
@@ -29,7 +26,7 @@ import se.fk.rimfrost.framework.oul.presentation.rest.OulUppgiftDoneHandler;
 
 @ApplicationScoped
 @Startup
-public class BekraftaBeslutService extends RegelManuellService implements OulHandlerInterface, OulUppgiftDoneHandler
+public class BekraftaBeslutService extends RegelManuellService implements OulUppgiftDoneHandler
 {
 
    @Inject
@@ -69,18 +66,6 @@ public class BekraftaBeslutService extends RegelManuellService implements OulHan
             regelData);
    }
 
-   @Override
-   public void handleOulResponse(OulResponse oulResponse)
-   {
-      var bekraftaBeslutData = regelDatas.get(oulResponse.kundbehovsflodeId());
-      var updatedRegelData = ImmutableRegelData.builder()
-            .from(bekraftaBeslutData)
-            .uppgiftId(oulResponse.uppgiftId())
-            .build();
-      regelDatas.put(updatedRegelData.kundbehovsflodeId(), updatedRegelData);
-      updateKundbehovsflodeInfo(updatedRegelData);
-   }
-
    public void updateErsattningData(UpdateErsattningDataRequest updateRequest)
    {
       var regelData = regelDatas.get(updateRequest.kundbehovsflodeId());
@@ -111,17 +96,6 @@ public class BekraftaBeslutService extends RegelManuellService implements OulHan
 
    }
 
-   @Override
-   public void handleOulStatus(OulStatus oulStatus)
-   {
-      RegelData regelData = regelDatas.values()
-            .stream()
-            .filter(r -> r.uppgiftId().equals(oulStatus.uppgiftId()))
-            .findFirst()
-            .orElse(regelDatas.get(oulStatus.kundbehovsflodeId()));
-      updateKundbehovsflodeInfo(regelData);
-   }
-
    private void updateRegelDataUnderlag(RegelData regelData, FolkbokfordResponse folkbokfordResponse,
          ArbetsgivareResponse arbetsgivareResponse) throws JsonProcessingException
    {
@@ -149,13 +123,6 @@ public class BekraftaBeslutService extends RegelManuellService implements OulHan
       }
 
       regelDatas.put(regelData.kundbehovsflodeId(), regelDataBuilder.build());
-   }
-
-   private void updateKundbehovsflodeInfo(RegelData regelData)
-   {
-      var request = bekraftaBeslutMapper.toUpdateKundbehovsflodeRequest(regelData, regelConfigProvider.getConfig());
-      kundbehovsflodeAdapter.updateKundbehovsflodeInfo(request);
-
    }
 
    @Override
