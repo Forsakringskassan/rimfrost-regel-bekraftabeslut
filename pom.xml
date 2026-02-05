@@ -84,16 +84,6 @@
       <version>0.0.0</version>
     </dependency>
     <dependency>
-      <groupId>se.fk.rimfrost.regel.common</groupId>
-      <artifactId>rimfrost-regel-common-openapi</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>se.fk.rimfrost.regel.common</groupId>
-      <artifactId>rimfrost-regel-common-openapi-jaxrs-spec</artifactId>
-      <version>0.1.0</version>
-    </dependency>
-    <dependency>
       <groupId>se.fk.rimfrost.regel.bekraftabeslut.openapi</groupId>
       <artifactId>rimfrost-regel-bekraftabeslut-openapi-jaxrs-spec</artifactId>
       <version>0.0.0</version>
@@ -116,7 +106,7 @@
     <dependency>
       <groupId>se.fk.rimfrost.framework.oul</groupId>
       <artifactId>rimfrost-framework-oul</artifactId>
-      <version>0.0.4</version>
+      <version>0.0.5</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel</groupId>

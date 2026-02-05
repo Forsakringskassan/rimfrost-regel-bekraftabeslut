@@ -14,11 +14,11 @@ import se.fk.github.bekraftabeslut.logic.dto.ImmutableGetBekraftaBeslutDataReque
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.RegelBekraftaBeslutControllerApi;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
-import se.fk.rimfrost.regel.common.jaxrsspec.controllers.generatedsource.RtfDoneControllerApi;
+import se.fk.rimfrost.framework.oul.presentation.rest.OulController;
 
 @ApplicationScoped
-@Path("/regel/bekrafta-beslut/{kundbehovsflodeId}")
-public class BekraftaBeslutController implements RegelBekraftaBeslutControllerApi, RtfDoneControllerApi
+@Path("/regel/bekrafta-beslut")
+public class BekraftaBeslutController extends OulController implements RegelBekraftaBeslutControllerApi
 {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(BekraftaBeslutController.class);
@@ -30,6 +30,7 @@ public class BekraftaBeslutController implements RegelBekraftaBeslutControllerAp
    BekraftaBeslutRestMapper mapper;
 
    @GET
+   @Path("/{kundbehovsflodeId}")
    @Override
    public GetDataResponse getData(UUID kundbehovsflodeId)
    {
@@ -47,21 +48,12 @@ public class BekraftaBeslutController implements RegelBekraftaBeslutControllerAp
    }
 
    @PATCH
-   @Path("/ersattning/{ersattningId}")
+   @Path("/{kundbehovsflodeId}/ersattning/{ersattningId}")
    @Override
    public void updateData(UUID kundbehovsflodeId, @Valid @NotNull PatchDataRequest patchRequest)
    {
       LOGGER.info("updateData received with patchrequest: " + patchRequest);
       var request = mapper.toUpdateErsattningDataRequest(kundbehovsflodeId, patchRequest);
       bekraftaBeslutService.updateErsattningData(request);
-   }
-
-   @POST
-   @Path("/done")
-   @Override
-   public void markDone(
-         @PathParam("kundbehovsflodeId") UUID kundbehovsflodeId)
-   {
-      bekraftaBeslutService.setUppgiftDone(kundbehovsflodeId);
    }
 }

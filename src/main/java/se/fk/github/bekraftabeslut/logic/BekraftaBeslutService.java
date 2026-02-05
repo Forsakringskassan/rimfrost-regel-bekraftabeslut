@@ -46,10 +46,11 @@ import se.fk.rimfrost.framework.regel.logic.entity.CloudEventData;
 import se.fk.rimfrost.framework.regel.logic.entity.ImmutableCloudEventData;
 import se.fk.rimfrost.framework.regel.presentation.kafka.RegelRequestHandlerInterface;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.FSSAinformation;
+import se.fk.rimfrost.framework.oul.presentation.rest.OulUppgiftDoneHandler;
 
 @ApplicationScoped
 @Startup
-public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulHandlerInterface
+public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulHandlerInterface, OulUppgiftDoneHandler
 {
 
    @ConfigProperty(name = "mp.messaging.outgoing.regel-responses.topic")
@@ -268,7 +269,8 @@ public class BekraftaBeslutService implements RegelRequestHandlerInterface, OulH
 
    }
 
-   public void setUppgiftDone(UUID kundbehovsflodeId)
+   @Override
+   public void handleUppgiftDone(UUID kundbehovsflodeId)
    {
       var bekraftaBeslutData = bekraftaBeslutDatas.get(kundbehovsflodeId);
 
