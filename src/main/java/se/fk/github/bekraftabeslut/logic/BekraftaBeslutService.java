@@ -14,7 +14,9 @@ import se.fk.github.bekraftabeslut.integration.folkbokford.dto.ImmutableFolkbokf
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataRequest;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.UpdateErsattningDataRequest;
+import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.integration.kundbehovsflode.dto.ImmutableKundbehovsflodeRequest;
+import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
 import se.fk.rimfrost.framework.regel.logic.entity.*;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellService;
 
@@ -119,4 +121,9 @@ public class BekraftaBeslutService extends RegelManuellService
       regelDatas.put(regelData.kundbehovsflodeId(), regelDataBuilder.build());
    }
 
+   @Override
+   protected Utfall decideUtfall(RegelData regelData)
+   {
+      return regelData.ersattningar().stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA) ? Utfall.JA : Utfall.NEJ;
+   }
 }
