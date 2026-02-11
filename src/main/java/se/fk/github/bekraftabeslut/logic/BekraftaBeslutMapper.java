@@ -11,10 +11,9 @@ import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse.Ersat
 import se.fk.rimfrost.framework.regel.integration.kundbehovsflode.dto.*;
 import se.fk.rimfrost.framework.regel.logic.entity.ErsattningData;
 import se.fk.rimfrost.framework.regel.logic.entity.RegelData;
-import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellMapper;
 
 @ApplicationScoped
-public class BekraftaBeslutMapper extends RegelManuellMapper
+public class BekraftaBeslutMapper
 {
 
    public GetBekraftaBeslutDataResponse toBekraftaBeslutResponse(KundbehovsflodeResponse kundbehovflodesResponse,
