@@ -14,11 +14,11 @@ import se.fk.github.bekraftabeslut.logic.dto.ImmutableGetBekraftaBeslutDataReque
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.RegelBekraftaBeslutControllerApi;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
-import se.fk.rimfrost.framework.oul.presentation.rest.OulController;
+import se.fk.rimfrost.framework.regel.manuell.presentation.rest.RegelManuellController;
 
 @ApplicationScoped
 @Path("/regel/bekrafta-beslut")
-public class BekraftaBeslutController extends OulController implements RegelBekraftaBeslutControllerApi
+public class BekraftaBeslutController extends RegelManuellController implements RegelBekraftaBeslutControllerApi
 {
 
    private static final Logger LOGGER = LoggerFactory.getLogger(BekraftaBeslutController.class);
