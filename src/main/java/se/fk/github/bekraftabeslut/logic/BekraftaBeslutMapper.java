@@ -2,13 +2,13 @@ package se.fk.github.bekraftabeslut.logic;
 
 import java.util.ArrayList;
 import jakarta.enterprise.context.ApplicationScoped;
-import se.fk.github.bekraftabeslut.integration.arbetsgivare.dto.ArbetsgivareResponse;
-import se.fk.github.bekraftabeslut.integration.folkbokford.dto.FolkbokfordResponse;
 import se.fk.github.bekraftabeslut.logic.dto.ImmutableErsattning;
 import se.fk.github.bekraftabeslut.logic.dto.ImmutableGetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse.Ersattning;
-import se.fk.rimfrost.framework.kundbehovsflode.adapter.dto.*;
+import se.fk.rimfrost.framework.arbetsgivare.adapter.dto.ArbetsgivareResponse;
+import se.fk.rimfrost.framework.folkbokford.adapter.dto.FolkbokfordResponse;
+import se.fk.rimfrost.framework.kundbehovsflode.adapter.dto.KundbehovsflodeResponse;
 import se.fk.rimfrost.framework.regel.logic.entity.ErsattningData;
 import se.fk.rimfrost.framework.regel.logic.entity.RegelData;
 
@@ -17,7 +17,8 @@ public class BekraftaBeslutMapper
 {
 
    public GetBekraftaBeslutDataResponse toBekraftaBeslutResponse(KundbehovsflodeResponse kundbehovflodesResponse,
-         FolkbokfordResponse folkbokfordResponse, ArbetsgivareResponse arbetsgivareResponse,
+         FolkbokfordResponse folkbokfordResponse,
+         ArbetsgivareResponse arbetsgivareResponse,
          RegelData regelData)
    {
       var ersattningsList = new ArrayList<Ersattning>();
@@ -65,9 +66,9 @@ public class BekraftaBeslutMapper
                .anstallningsdag(arbetsgivareResponse.anstallningsdag())
                .sistaAnstallningsdag(arbetsgivareResponse.sistaAnstallningsdag())
                .arbetstidProcent(arbetsgivareResponse.arbetstidProcent())
-               .loneSumma(arbetsgivareResponse.loneSumma())
-               .lonFrom(arbetsgivareResponse.lonFrom())
-               .lonTom(arbetsgivareResponse.lonTom())
+               .loneSumma(40000) //TODO: Replace when salary is available in api response
+               .lonFrom(arbetsgivareResponse.anstallningsdag()) // TODO: Replace when salary start date is available in api response
+               .lonTom(arbetsgivareResponse.anstallningsdag()) // TODO: Replace when salary end date is available in api response
                .organisationsnamn(arbetsgivareResponse.organisationsnamn())
                .organisationsnummer(arbetsgivareResponse.organisationsnummer());
       }
