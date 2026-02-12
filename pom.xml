@@ -108,6 +108,16 @@
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
       <version>0.1.6</version>
     </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.framework.arbetsgivare</groupId>
+      <artifactId>rimfrost-framework-arbetsgivare-adapter</artifactId>
+      <version>0.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.framework.folkbokford</groupId>
+      <artifactId>rimfrost-framework-folkbokford-adapter</artifactId>
+      <version>0.0.2</version>
+    </dependency>
   </dependencies>
 
   <repositories>
