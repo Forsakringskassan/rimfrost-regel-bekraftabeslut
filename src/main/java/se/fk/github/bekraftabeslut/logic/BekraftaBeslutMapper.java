@@ -8,7 +8,7 @@ import se.fk.github.bekraftabeslut.logic.dto.ImmutableErsattning;
 import se.fk.github.bekraftabeslut.logic.dto.ImmutableGetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
 import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse.Ersattning;
-import se.fk.rimfrost.framework.regel.integration.kundbehovsflode.dto.*;
+import se.fk.rimfrost.framework.kundbehovsflode.adapter.dto.*;
 import se.fk.rimfrost.framework.regel.logic.entity.ErsattningData;
 import se.fk.rimfrost.framework.regel.logic.entity.RegelData;
 
