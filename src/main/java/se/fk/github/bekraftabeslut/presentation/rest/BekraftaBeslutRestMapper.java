@@ -73,7 +73,7 @@ public class BekraftaBeslutRestMapper
             .build();
    }
 
-   private se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall mapBeslutsutfall(
+   private Beslutsutfall mapBeslutsutfall(
          se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall beslututfall)
    {
        return switch (beslututfall) {
@@ -85,7 +85,7 @@ public class BekraftaBeslutRestMapper
    }
 
    private se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall mapBeslutsutfall(
-         se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall beslututfall)
+         Beslutsutfall beslututfall)
    {
        return switch (beslututfall) {
            case JA ->
