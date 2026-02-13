@@ -69,21 +69,6 @@
       <version>2.5</version>
     </dependency>
     <dependency>
-      <groupId>se.fk.rimfrost</groupId>
-      <artifactId>rimfrost-service-oul-asyncapi</artifactId>
-      <version>0.4.1</version>
-    </dependency>
-    <dependency>
-      <groupId>se.fk.rimfrost.regel.bekraftabeslut</groupId>
-      <artifactId>rimfrost-regel-bekraftabeslut-asyncapi</artifactId>
-      <version>0.0.2</version>
-    </dependency>
-    <dependency>
-      <groupId>se.fk.rimfrost.framework.regel</groupId>
-      <artifactId>rimfrost-framework-regel-asyncapi</artifactId>
-      <version>0.0.0</version>
-    </dependency>
-    <dependency>
       <groupId>se.fk.rimfrost.regel.bekraftabeslut.openapi</groupId>
       <artifactId>rimfrost-regel-bekraftabeslut-openapi-jaxrs-spec</artifactId>
       <version>0.0.0</version>
