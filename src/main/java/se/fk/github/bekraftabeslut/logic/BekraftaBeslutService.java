@@ -55,14 +55,12 @@ public class BekraftaBeslutService extends RegelManuellService
             .build();
       var arbetsgivareResponse = arbetsgivareAdapter.getArbetsgivareInfo(arbetsgivareRequest);
 
-      RegelData regelData;
-      synchronized (commonRegelData.getLock())
-      {
-         var regelDatas = commonRegelData.getRegelDatas();
-         regelData = regelDatas.get(request.kundbehovsflodeId());
-      }
+      RegelData regelData = commonRegelData.getRegelData(request.kundbehovsflodeId());
 
       updateRegelDataUnderlag(regelData, folkbokfordResponse, arbetsgivareResponse);
+
+      // Read RegelData again to get updated version
+      regelData = commonRegelData.getRegelData(request.kundbehovsflodeId());
 
       updateKundbehovsFlode(regelData);
 
@@ -72,12 +70,7 @@ public class BekraftaBeslutService extends RegelManuellService
 
    public void updateErsattningData(UpdateErsattningDataRequest updateRequest)
    {
-      RegelData regelData;
-      synchronized (commonRegelData.getLock())
-      {
-         var regelDatas = commonRegelData.getRegelDatas();
-         regelData = regelDatas.get(updateRequest.kundbehovsflodeId());
-      }
+      RegelData regelData = commonRegelData.getRegelData(updateRequest.kundbehovsflodeId());
 
       var existingErsattning = regelData.ersattningar().stream()
             .filter(e -> e.id().equals(updateRequest.ersattningId()))
