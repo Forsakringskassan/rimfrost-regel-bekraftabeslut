@@ -47,7 +47,8 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 @QuarkusTestResource.List(
 {
       @QuarkusTestResource(WireMockTestResource.class),
-      @QuarkusTestResource(InMemoryKafkaTestResource.class)
+      @QuarkusTestResource(InMemoryKafkaTestResource.class),
+      @QuarkusTestResource(StorageDataTestResource.class)
 })
 class BekraftaBeslutTest
 {
