@@ -10,7 +10,7 @@ import se.fk.rimfrost.framework.arbetsgivare.adapter.dto.ArbetsgivareResponse;
 import se.fk.rimfrost.framework.folkbokford.adapter.dto.FolkbokfordResponse;
 import se.fk.rimfrost.framework.kundbehovsflode.adapter.dto.KundbehovsflodeResponse;
 import se.fk.rimfrost.framework.regel.logic.entity.ErsattningData;
-import se.fk.rimfrost.framework.regel.logic.entity.RegelData;
+import se.fk.rimfrost.framework.regel.manuell.logic.entity.RegelData;
 
 @ApplicationScoped
 public class BekraftaBeslutMapper

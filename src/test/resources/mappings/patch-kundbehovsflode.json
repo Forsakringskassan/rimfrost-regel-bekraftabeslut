@@ -1,0 +1,74 @@
+{
+  "request": {
+    "method": "PATCH",
+    "urlPathPattern": "/kundbehovsflode/.*/ersattning"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "kundbehovsflode": {
+        "id": "482a43b7-c985-4f65-ae41-fb75de3a6a6f",
+        "kundbehov": {
+          "id": "fa51c627-49e4-4efc-b8f8-4dee8a88313f",
+          "formanstyp": "VAH",
+          "version": "1.0",
+          "kundbehovsdatum": "2025-12-17T11:10:45.625135145Z",
+          "kundbehovsstatus": "FASTSTALLT",
+          "period": {
+            "start": "2026-01-10T16:15:50Z",
+            "slut": "2026-01-10T16:15:50Z"
+          },
+          "avsikt": "NY",
+          "andringsorsak": "",
+          "kundbehovsroll": [
+            {
+              "id": "73cd2ccf-9fd9-4045-b694-24e705c5568f",
+              "individ": {
+                "id": "19900101-1234",
+                "fornamn": "Lisa",
+                "efternamn": "Tass"
+              },
+              "roll": "AGARE",
+              "yrkande": true
+            }
+          ],
+          "ersattning": [
+            {
+              "id": "67c5ded8-7697-41fd-b943-c58a1be15c93",
+              "belopp": 40000,
+              "berakningsgrund": "LON",
+              "beloppstyp": "INKOMSTBASERAD",
+              "ersattningstyp": "HUNDBIDRAG",
+              "periodisering": "DAG",
+              "omfattning": 100,
+              "beslutsutfall": "FU",
+              "avslagsanledning": "",
+              "produceratResultat": {
+                "id": "0f55cd9a-baff-4399-b91d-78cbd4d3dcb3",
+                "version": "1.0",
+                "from": "2026-01-10T16:15:50Z",
+                "tom": "2026-01-11T16:15:50Z",
+                "status": "PLANERAT"
+              }
+            }
+          ]
+        },
+        "version": "1.0",
+        "processinstansId": "8d82ee66-3c0a-4782-b026-179ad3a789b3",
+        "skapadTS": "2025-12-17T11:10:58.188074631Z",
+        "avslutadTS": null,
+        "kundbehovsspecifikation": {
+          "id": "91bb9388-da7d-47ce-92bb-18ab31982fac",
+          "version": "1.0",
+          "bpmn": "VAH",
+          "namn": "Vård av hudsjur",
+          "beskrivning": "Kollar om du har rätt för ersättning för vård av husdjur",
+          "uppgiftspecifikation": []
+        }
+      }
+    }
+  }
+}
