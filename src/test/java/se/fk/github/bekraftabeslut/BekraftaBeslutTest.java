@@ -30,6 +30,7 @@ import se.fk.rimfrost.framework.regel.RegelRequestMessagePayloadData;
 import se.fk.rimfrost.framework.regel.RegelResponseMessagePayload;
 import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutKundbehovsflodeRequest;
+import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.UppgiftStatus;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
@@ -195,9 +196,10 @@ class BekraftaBeslutTest
       // Verify GET kundbehovsflöde requested
       //
       List<LoggedRequest> kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer,
-            kundbehovsflodeEndpoint + kundbehovsflodeId, 3);
+            kundbehovsflodeEndpoint + kundbehovsflodeId, 1);
       var getRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.GET)).toList();
       assertFalse(getRequests.isEmpty());
+      wiremockServer.resetRequests();
       //
       // Verify oul message produced
       //
@@ -216,10 +218,11 @@ class BekraftaBeslutTest
       //
       // Verify PUT kundbehovsflöde requested
       //
-      kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 3);
+      kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 1);
       var putRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
       assertEquals(1, putRequests.size());
       assertTrue(putRequests.getFirst().getUrl().contains(kundbehovsflodeId));
+      wiremockServer.resetRequests();
       //
       // mock status update from OUL
       //
@@ -235,10 +238,11 @@ class BekraftaBeslutTest
       //
       // Verify PUT kundbehovsflöde requested
       //
-      kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 3);
+      kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 1);
       putRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
       //assertEquals(2, putRequests.size());
       assertTrue(putRequests.getFirst().getUrl().contains(kundbehovsflodeId));
+      wiremockServer.resetRequests();
       //
       // mock GET operation requested from portal FE
       //
@@ -256,6 +260,7 @@ class BekraftaBeslutTest
       patchDataRequest.setErsattningId(UUID.fromString("67c5ded8-7697-41fd-b943-c58a1be15c93"));
       patchDataRequest.setSignera(true);
       sendPatchBekraftaBeslut(kundbehovsflodeId, patchDataRequest);
+      wiremockServer.resetRequests();
       //
       // mock POST operation from portal FE
       //
@@ -263,12 +268,13 @@ class BekraftaBeslutTest
       //
       // verify that rule performed requests to kundbehovsflode
       //
-      kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 5);
+      kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 1);
       putRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
-      assertEquals(5, putRequests.size());
+      assertEquals(1, putRequests.size());
       var sentJson = putRequests.getLast().getBodyAsString();
       var sentPutKundbehovsflodeRequest = mapper.readValue(sentJson, PutKundbehovsflodeRequest.class);
-      // assertEquals(UppgiftStatus.AVSLUTAD, sentPutKundbehovsflodeRequest.getUppgift().getUppgiftStatus());
+      assertEquals(UppgiftStatus.AVSLUTAD, sentPutKundbehovsflodeRequest.getUppgift().getUppgiftStatus());
+      wiremockServer.resetRequests();
       //
       // verify kafka status message sent to oul
       //
