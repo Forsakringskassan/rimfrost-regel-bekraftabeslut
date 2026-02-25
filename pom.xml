@@ -76,7 +76,7 @@
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>0.1.20</version>
+      <version>0.1.21</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.arbetsgivare</groupId>
