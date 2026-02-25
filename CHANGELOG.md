@@ -2,6 +2,12 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 0.0.3 (2026-02-25)
+
+### Bug Fixes
+
+-  Bump rimfrost-framework-regel-manuell version to include upstream bugfix ([402fb](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/402fb98984f9e1e) Lars Persson)  
+
 ## 0.0.2 (2026-02-24)
 
 ### Bug Fixes
