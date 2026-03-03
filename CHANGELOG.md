@@ -2,6 +2,14 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 0.0.4 (2026-03-03)
+
+### Bug Fixes
+
+-  Bump to trigger release flow ([a1c7f](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/a1c7fd9820cde58) Lars Persson)  
+-  **deps**  update dependency se.fk.rimfrost.regel.bekraftabeslut.openapi:rimfrost-regel-bekraftabeslut-openapi-jaxrs-spec to v0.0.1 ([579a7](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/579a78e98577878) renovate[bot])  
+-  Bump rimfrost-framework-regel-manuell version to include upstream bugfix ([d5bad](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/d5badfe7c32be84) Lars Persson)  
+
 ## 0.0.3 (2026-02-25)
 
 ### Bug Fixes
