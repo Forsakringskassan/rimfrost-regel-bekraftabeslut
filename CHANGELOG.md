@@ -2,6 +2,12 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 0.0.5 (2026-03-04)
+
+### Bug Fixes
+
+-  Rename kundbehovsflode to handlaggning ([a4325](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/a4325f5873c2b86) Lars Persson)  
+
 ## 0.0.4 (2026-03-03)
 
 ### Bug Fixes
