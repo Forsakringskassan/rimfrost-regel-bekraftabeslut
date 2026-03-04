@@ -14,7 +14,7 @@ import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.FSSAinformatio
 public interface BekraftaBeslutData
 {
 
-   UUID kundbehovsflodeId();
+   UUID handlaggningId();
 
    UUID cloudeventId();
 

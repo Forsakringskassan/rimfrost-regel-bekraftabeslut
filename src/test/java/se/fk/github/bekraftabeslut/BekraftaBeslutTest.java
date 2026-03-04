@@ -29,7 +29,7 @@ import se.fk.rimfrost.framework.regel.RegelRequestMessagePayload;
 import se.fk.rimfrost.framework.regel.RegelRequestMessagePayloadData;
 import se.fk.rimfrost.framework.regel.RegelResponseMessagePayload;
 import se.fk.rimfrost.framework.regel.Utfall;
-import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutKundbehovsflodeRequest;
+import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutHandlaggningRequest;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.UppgiftStatus;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
@@ -62,7 +62,7 @@ class BekraftaBeslutTest
    private static final String regelResponsesChannel = "regel-responses";
    private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
          .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-   private static final String kundbehovsflodeEndpoint = "/kundbehovsflode/";
+   private static final String handlaggningEndpoint = "/handlaggning/";
    private static WireMockServer wiremockServer;
 
    @BeforeAll
@@ -118,11 +118,11 @@ class BekraftaBeslutTest
       return requests;
    }
 
-   private void sendBekraftaBeslutRequest(String kundbehovsflodeId) throws Exception
+   private void sendBekraftaBeslutRequest(String handlaggningId) throws Exception
    {
       RegelRequestMessagePayload payload = new RegelRequestMessagePayload();
       RegelRequestMessagePayloadData data = new RegelRequestMessagePayloadData();
-      data.setKundbehovsflodeId(kundbehovsflodeId);
+      data.setHandlaggningId(handlaggningId);
       payload.setSpecversion(se.fk.rimfrost.framework.regel.SpecVersion.NUMBER_1_DOT_0);
       payload.setId("99994567-89ab-4cde-9012-3456789abcde");
       payload.setSource("TestSource-001");
@@ -163,23 +163,23 @@ class BekraftaBeslutTest
       return inMemoryConnector.sink(channel).received();
    }
 
-   private GetDataResponse sendGetBekraftaBeslut(String kundbehovsflodeId)
+   private GetDataResponse sendGetBekraftaBeslut(String handlaggningId)
    {
-      return given().when().get("/regel/bekrafta-beslut/{kundbehovsflodeId}", kundbehovsflodeId).then().statusCode(200).extract()
+      return given().when().get("/regel/bekrafta-beslut/{handlaggningId}", handlaggningId).then().statusCode(200).extract()
             .as(GetDataResponse.class);
    }
 
-   private void sendPatchBekraftaBeslut(String kundbehovsflodeId, PatchDataRequest patchDataRequest)
+   private void sendPatchBekraftaBeslut(String handlaggningId, PatchDataRequest patchDataRequest)
    {
       given().contentType(ContentType.JSON).body(patchDataRequest).when()
-            .patch("/regel/bekrafta-beslut/{kundbehovsflodeId}/ersattning/{ersattningId}", kundbehovsflodeId,
+            .patch("/regel/bekrafta-beslut/{handlaggningId}/ersattning/{ersattningId}", handlaggningId,
                   patchDataRequest.getErsattningId())
             .then().statusCode(204);
    }
 
-   private void sendPostBekraftaBeslut(String kundbehovsflodeId)
+   private void sendPostBekraftaBeslut(String handlaggningId)
    {
-      given().when().post("/regel/bekrafta-beslut/{kundbehovsflodeId}/done", kundbehovsflodeId).then().statusCode(204);
+      given().when().post("/regel/bekrafta-beslut/{handlaggningId}/done", handlaggningId).then().statusCode(204);
    }
 
    @ParameterizedTest
@@ -187,17 +187,17 @@ class BekraftaBeslutTest
    {
          "5367f6b8-cc4a-11f0-8de9-199901011234"
    })
-   void BekraftaBeslutSmokeTest(String kundbehovsflodeId) throws Exception
+   void BekraftaBeslutSmokeTest(String handlaggningId) throws Exception
    {
       setupWiremock();
       // Send regel request to start workflow
-      sendBekraftaBeslutRequest(kundbehovsflodeId); // TODO metoden kan göras re-usable för alla regler
+      sendBekraftaBeslutRequest(handlaggningId); // TODO metoden kan göras re-usable för alla regler
       //
-      // Verify GET kundbehovsflöde requested
+      // Verify GET handläggning requested
       //
-      List<LoggedRequest> kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer,
-            kundbehovsflodeEndpoint + kundbehovsflodeId, 1);
-      var getRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.GET)).toList();
+      List<LoggedRequest> handlaggningRequests = waitForWireMockRequest(wiremockServer,
+            handlaggningEndpoint + handlaggningId, 1);
+      var getRequests = handlaggningRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.GET)).toList();
       assertFalse(getRequests.isEmpty());
       wiremockServer.resetRequests();
       //
@@ -207,21 +207,21 @@ class BekraftaBeslutTest
       assertEquals(1, messages.size());
       var oulRequestMessage = (OperativtUppgiftslagerRequestMessage) messages.getFirst().getPayload();
       assertEquals("Bekräfta beslut", oulRequestMessage.getBeskrivning());
-      assertEquals(kundbehovsflodeId, oulRequestMessage.getKundbehovsflodeId());
+      assertEquals(handlaggningId, oulRequestMessage.getHandlaggningId());
       //
       // Send mocked OUL response
       //
       OperativtUppgiftslagerResponseMessage oulResponseMessage = new OperativtUppgiftslagerResponseMessage();
-      oulResponseMessage.setKundbehovsflodeId(kundbehovsflodeId);
+      oulResponseMessage.setHandlaggningId(handlaggningId);
       oulResponseMessage.setUppgiftId("11e53b18-e9ac-4707-825b-a1cb80689c29");
       inMemoryConnector.source(oulResponsesChannel).send(oulResponseMessage);
       //
-      // Verify PUT kundbehovsflöde requested
+      // Verify PUT handläggning requested
       //
-      kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 1);
-      var putRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
+      handlaggningRequests = waitForWireMockRequest(wiremockServer, handlaggningEndpoint + handlaggningId, 1);
+      var putRequests = handlaggningRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
       assertEquals(1, putRequests.size());
-      assertTrue(putRequests.getFirst().getUrl().contains(kundbehovsflodeId));
+      assertTrue(putRequests.getFirst().getUrl().contains(handlaggningId));
       wiremockServer.resetRequests();
       //
       // mock status update from OUL
@@ -229,28 +229,28 @@ class BekraftaBeslutTest
       OperativtUppgiftslagerStatusMessage oulStatusMessage = new OperativtUppgiftslagerStatusMessage();
       oulStatusMessage.setStatus(Status.NY);
       oulStatusMessage.setUppgiftId(oulResponseMessage.getUppgiftId());
-      oulStatusMessage.setKundbehovsflodeId(kundbehovsflodeId);
+      oulStatusMessage.setHandlaggningId(handlaggningId);
       oulStatusMessage.setUtforarId("383cc515-4c55-479b-a96b-244734ef1336");
       inMemoryConnector.source(oulStatusNotificationChannel).send(oulStatusMessage);
       //
       // verify expected actions from bekrafta beslut as result of new status reported
       //
       //
-      // Verify PUT kundbehovsflöde requested
+      // Verify PUT handläggning requested
       //
-      kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 1);
-      putRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
+      handlaggningRequests = waitForWireMockRequest(wiremockServer, handlaggningEndpoint + handlaggningId, 1);
+      putRequests = handlaggningRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
       //assertEquals(2, putRequests.size());
-      assertTrue(putRequests.getFirst().getUrl().contains(kundbehovsflodeId));
+      assertTrue(putRequests.getFirst().getUrl().contains(handlaggningId));
       wiremockServer.resetRequests();
       //
       // mock GET operation requested from portal FE
       //
-      var getBekraftaBeslutResponse = sendGetBekraftaBeslut(kundbehovsflodeId);
+      var getBekraftaBeslutResponse = sendGetBekraftaBeslut(handlaggningId);
       //
       // Verify GET operation response
       //
-      assertEquals(kundbehovsflodeId, getBekraftaBeslutResponse.getKundbehovsflodeId().toString());
+      assertEquals(handlaggningId, getBekraftaBeslutResponse.getHandlaggningId().toString());
       //
       // mock PATCH operation from portal FE
       //
@@ -259,21 +259,21 @@ class BekraftaBeslutTest
       patchDataRequest.setBeslutsutfall(Beslutsutfall.JA);
       patchDataRequest.setErsattningId(UUID.fromString("67c5ded8-7697-41fd-b943-c58a1be15c93"));
       patchDataRequest.setSignera(true);
-      sendPatchBekraftaBeslut(kundbehovsflodeId, patchDataRequest);
+      sendPatchBekraftaBeslut(handlaggningId, patchDataRequest);
       wiremockServer.resetRequests();
       //
       // mock POST operation from portal FE
       //
-      sendPostBekraftaBeslut(kundbehovsflodeId);
+      sendPostBekraftaBeslut(handlaggningId);
       //
-      // verify that rule performed requests to kundbehovsflode
+      // verify that rule performed requests to handlaggning
       //
-      kundbehovsflodeRequests = waitForWireMockRequest(wiremockServer, kundbehovsflodeEndpoint + kundbehovsflodeId, 1);
-      putRequests = kundbehovsflodeRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
+      handlaggningRequests = waitForWireMockRequest(wiremockServer, handlaggningEndpoint + handlaggningId, 1);
+      putRequests = handlaggningRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
       assertEquals(1, putRequests.size());
       var sentJson = putRequests.getLast().getBodyAsString();
-      var sentPutKundbehovsflodeRequest = mapper.readValue(sentJson, PutKundbehovsflodeRequest.class);
-      assertEquals(UppgiftStatus.AVSLUTAD, sentPutKundbehovsflodeRequest.getUppgift().getUppgiftStatus());
+      var sentPutHandlaggningRequest = mapper.readValue(sentJson, PutHandlaggningRequest.class);
+      assertEquals(UppgiftStatus.AVSLUTAD, sentPutHandlaggningRequest.getUppgift().getUppgiftStatus());
       wiremockServer.resetRequests();
       //
       // verify kafka status message sent to oul
@@ -289,7 +289,7 @@ class BekraftaBeslutTest
       messages = waitForMessages(regelResponsesChannel);
       assertEquals(1, messages.size());
       var regelResponseMessagePayload = (RegelResponseMessagePayload) messages.getFirst().getPayload();
-      assertEquals(kundbehovsflodeId, regelResponseMessagePayload.getData().getKundbehovsflodeId());
+      assertEquals(handlaggningId, regelResponseMessagePayload.getData().getHandlaggningId());
       assertEquals(Utfall.JA, regelResponseMessagePayload.getData().getUtfall());
    }
 

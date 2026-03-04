@@ -41,7 +41,7 @@ public class BekraftaBeslutRestMapper
 
       var response = new GetDataResponse();
       response.setKund(kund);
-      response.kundbehovsflodeId(bekraftaBeslutResponse.kundbehovsflodeId());
+      response.handlaggningId(bekraftaBeslutResponse.handlaggningId());
       for (var bekraftaBeslutErsattning : bekraftaBeslutResponse.ersattning())
       {
          var ersattning = new Ersattning();
@@ -62,10 +62,10 @@ public class BekraftaBeslutRestMapper
       return response;
    }
 
-   public UpdateErsattningDataRequest toUpdateErsattningDataRequest(UUID kundbehovsflodeId, PatchDataRequest patchRequest)
+   public UpdateErsattningDataRequest toUpdateErsattningDataRequest(UUID handlaggningId, PatchDataRequest patchRequest)
    {
       return ImmutableUpdateErsattningDataRequest.builder()
-            .kundbehovsflodeId(kundbehovsflodeId)
+            .handlaggningId(handlaggningId)
             .beslutsutfall(mapBeslutsutfall(patchRequest.getBeslutsutfall()))
             .ersattningId(patchRequest.getErsattningId())
             .avslagsanledning(patchRequest.getAvslagsanledning())

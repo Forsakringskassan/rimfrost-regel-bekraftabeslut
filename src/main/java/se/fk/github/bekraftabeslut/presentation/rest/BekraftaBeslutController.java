@@ -30,14 +30,14 @@ public class BekraftaBeslutController extends RegelManuellController implements 
    BekraftaBeslutRestMapper mapper;
 
    @GET
-   @Path("/{kundbehovsflodeId}")
+   @Path("/{handlaggningId}")
    @Override
-   public GetDataResponse getData(UUID kundbehovsflodeId)
+   public GetDataResponse getData(UUID handlaggningId)
    {
       try
       {
          var request = ImmutableGetBekraftaBeslutDataRequest.builder()
-               .kundbehovsflodeId(kundbehovsflodeId).build();
+               .handlaggningId(handlaggningId).build();
          var response = bekraftaBeslutService.getData(request);
          return mapper.toGetDataResponse(response);
       }
@@ -48,12 +48,12 @@ public class BekraftaBeslutController extends RegelManuellController implements 
    }
 
    @PATCH
-   @Path("/{kundbehovsflodeId}/ersattning/{ersattningId}")
+   @Path("/{handlaggningId}/ersattning/{ersattningId}")
    @Override
-   public void updateData(UUID kundbehovsflodeId, @Valid @NotNull PatchDataRequest patchRequest)
+   public void updateData(UUID handlaggningId, @Valid @NotNull PatchDataRequest patchRequest)
    {
       LOGGER.info("updateData received with patchrequest: " + patchRequest);
-      var request = mapper.toUpdateErsattningDataRequest(kundbehovsflodeId, patchRequest);
+      var request = mapper.toUpdateErsattningDataRequest(handlaggningId, patchRequest);
       bekraftaBeslutService.updateErsattningData(request);
    }
 

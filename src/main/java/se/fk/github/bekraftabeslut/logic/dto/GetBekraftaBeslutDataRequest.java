@@ -8,6 +8,6 @@ import org.immutables.value.Value;
 public interface GetBekraftaBeslutDataRequest
 {
 
-   UUID kundbehovsflodeId();
+   UUID handlaggningId();
 
 }

@@ -19,8 +19,8 @@ import se.fk.rimfrost.framework.arbetsgivare.adapter.dto.ImmutableArbetsgivareRe
 import se.fk.rimfrost.framework.folkbokford.adapter.FolkbokfordAdapter;
 import se.fk.rimfrost.framework.folkbokford.adapter.dto.FolkbokfordResponse;
 import se.fk.rimfrost.framework.folkbokford.adapter.dto.ImmutableFolkbokfordRequest;
-import se.fk.rimfrost.framework.kundbehovsflode.adapter.KundbehovsflodeAdapter;
-import se.fk.rimfrost.framework.kundbehovsflode.adapter.dto.ImmutableKundbehovsflodeRequest;
+import se.fk.rimfrost.framework.handlaggning.adapter.HandlaggningAdapter;
+import se.fk.rimfrost.framework.handlaggning.adapter.dto.ImmutableHandlaggningRequest;
 import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.integration.config.RegelConfigProvider;
 import se.fk.rimfrost.framework.regel.logic.RegelMapper;
@@ -58,7 +58,7 @@ public class BekraftaBeslutService implements RegelManuellServiceInterface
    ArbetsgivareAdapter arbetsgivareAdapter;
 
    @Inject
-   KundbehovsflodeAdapter kundbehovsflodeAdapter;
+   HandlaggningAdapter handlaggningAdapter;
 
    @Inject
    BekraftaBeslutDataStorageProvider dataStorageProvider;
@@ -85,37 +85,37 @@ public class BekraftaBeslutService implements RegelManuellServiceInterface
 
    public GetBekraftaBeslutDataResponse getData(GetBekraftaBeslutDataRequest request) throws JsonProcessingException
    {
-      var kundbehovsflodeRequest = ImmutableKundbehovsflodeRequest.builder()
-            .kundbehovsflodeId(request.kundbehovsflodeId())
+      var handlaggningRequest = ImmutableHandlaggningRequest.builder()
+            .handlaggningId(request.handlaggningId())
             .build();
-      var kundbehovflodesResponse = kundbehovsflodeAdapter.getKundbehovsflodeInfo(kundbehovsflodeRequest);
+      var handlaggningsResponse = handlaggningAdapter.getHandlaggningInfo(handlaggningRequest);
       var folkbokfordRequest = ImmutableFolkbokfordRequest.builder()
-            .personnummer(kundbehovflodesResponse.personnummer())
+            .personnummer(handlaggningsResponse.personnummer())
             .build();
       var folkbokfordResponse = folkbokfordAdapter.getFolkbokfordInfo(folkbokfordRequest);
       var arbetsgivareRequest = ImmutableArbetsgivareRequest.builder()
-            .personnummer(kundbehovflodesResponse.personnummer())
+            .personnummer(handlaggningsResponse.personnummer())
             .build();
       var arbetsgivareResponse = arbetsgivareAdapter.getArbetsgivareInfo(arbetsgivareRequest);
 
-      RegelData regelData = commonRegelData.getRegelData(request.kundbehovsflodeId());
+      RegelData regelData = commonRegelData.getRegelData(request.handlaggningId());
 
-      updateRegelDataUnderlag(request.kundbehovsflodeId(), regelData, folkbokfordResponse, arbetsgivareResponse);
+      updateRegelDataUnderlag(request.handlaggningId(), regelData, folkbokfordResponse, arbetsgivareResponse);
 
       // Read RegelData again to get updated version
-      regelData = commonRegelData.getRegelData(request.kundbehovsflodeId());
+      regelData = commonRegelData.getRegelData(request.handlaggningId());
 
-      var putKundbehovsflodeRequest = regelMapper.toPutKundbehovsflodeRequest(request.kundbehovsflodeId(),
+      var putHandlaggningRequest = regelMapper.toPutHandlaggningRequest(request.handlaggningId(),
             regelData.uppgiftData(), regelData.underlag(), regelConfig);
-      kundbehovsflodeAdapter.putKundbehovsflode(putKundbehovsflodeRequest);
+      handlaggningAdapter.putHandlaggning(putHandlaggningRequest);
 
-      return bekraftaBeslutMapper.toBekraftaBeslutResponse(kundbehovflodesResponse, folkbokfordResponse, arbetsgivareResponse,
+      return bekraftaBeslutMapper.toBekraftaBeslutResponse(handlaggningsResponse, folkbokfordResponse, arbetsgivareResponse,
             regelData);
    }
 
    public void updateErsattningData(UpdateErsattningDataRequest updateRequest)
    {
-      RegelData regelData = commonRegelData.getRegelData(updateRequest.kundbehovsflodeId());
+      RegelData regelData = commonRegelData.getRegelData(updateRequest.handlaggningId());
 
       var existingErsattning = regelData.ersattningar().stream()
             .filter(e -> e.id().equals(updateRequest.ersattningId()))
@@ -140,16 +140,16 @@ public class BekraftaBeslutService implements RegelManuellServiceInterface
       synchronized (commonRegelData.getLock())
       {
          var regelDatas = commonRegelData.getRegelDatas();
-         regelDatas.put(updateRequest.kundbehovsflodeId(), updatedRegelData);
+         regelDatas.put(updateRequest.handlaggningId(), updatedRegelData);
          storageManager.store(regelDatas);
       }
 
-      var patchKundbehovsflodeRequest = regelMapper.toPatchKundbehovsflodeRequest(updateRequest.kundbehovsflodeId(),
+      var patchHandlaggningRequest = regelMapper.toPatchHandlaggningRequest(updateRequest.handlaggningId(),
             updatedRegelData.ersattningar());
-      kundbehovsflodeAdapter.patchKundbehovsflode(patchKundbehovsflodeRequest);
+      handlaggningAdapter.patchHandlaggning(patchHandlaggningRequest);
    }
 
-   private void updateRegelDataUnderlag(UUID kundbehovsflodeId, RegelData regelData, FolkbokfordResponse folkbokfordResponse,
+   private void updateRegelDataUnderlag(UUID handlaggningId, RegelData regelData, FolkbokfordResponse folkbokfordResponse,
          ArbetsgivareResponse arbetsgivareResponse) throws JsonProcessingException
    {
 
@@ -178,7 +178,7 @@ public class BekraftaBeslutService implements RegelManuellServiceInterface
       synchronized (commonRegelData.getLock())
       {
          var regelDatas = commonRegelData.getRegelDatas();
-         regelDatas.put(kundbehovsflodeId, regelDataBuilder.build());
+         regelDatas.put(handlaggningId, regelDataBuilder.build());
          storageManager.store(regelDatas);
       }
    }
@@ -190,7 +190,7 @@ public class BekraftaBeslutService implements RegelManuellServiceInterface
    }
 
    @Override
-   public void handleRegelDone(UUID kundbehovsId)
+   public void handleRegelDone(UUID handlaggningId)
    {
       // Empty since no rule specific data is currently being used
    }

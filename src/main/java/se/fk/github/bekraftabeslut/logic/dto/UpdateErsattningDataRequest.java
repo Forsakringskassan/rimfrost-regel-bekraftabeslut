@@ -8,7 +8,7 @@ import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
 public interface UpdateErsattningDataRequest
 {
 
-   UUID kundbehovsflodeId();
+   UUID handlaggningId();
 
    UUID ersattningId();
 

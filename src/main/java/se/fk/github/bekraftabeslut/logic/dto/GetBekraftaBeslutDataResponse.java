@@ -11,7 +11,7 @@ import se.fk.rimfrost.framework.regel.logic.dto.Beslutsutfall;
 public interface GetBekraftaBeslutDataResponse
 {
 
-   UUID kundbehovsflodeId();
+   UUID handlaggningId();
 
    String fornamn();
 
