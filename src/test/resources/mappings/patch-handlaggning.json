@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "PATCH",
-    "urlPathPattern": "/kundbehovsflode/.*/ersattning"
+    "urlPathPattern": "/handlaggning/.*/ersattning"
   },
   "response": {
     "status": 200,
@@ -9,21 +9,21 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "kundbehovsflode": {
+      "handlaggning": {
         "id": "482a43b7-c985-4f65-ae41-fb75de3a6a6f",
-        "kundbehov": {
+        "yrkande": {
           "id": "fa51c627-49e4-4efc-b8f8-4dee8a88313f",
           "formanstyp": "VAH",
           "version": "1.0",
-          "kundbehovsdatum": "2025-12-17T11:10:45.625135145Z",
-          "kundbehovsstatus": "FASTSTALLT",
+          "yrkandedatum": "2025-12-17T11:10:45.625135145Z",
+          "yrkandestatus": "FASTSTALLT",
           "period": {
             "start": "2026-01-10T16:15:50Z",
             "slut": "2026-01-10T16:15:50Z"
           },
           "avsikt": "NY",
           "andringsorsak": "",
-          "kundbehovsroll": [
+          "yrkanderoll": [
             {
               "id": "73cd2ccf-9fd9-4045-b694-24e705c5568f",
               "individ": {
@@ -60,7 +60,7 @@
         "processinstansId": "8d82ee66-3c0a-4782-b026-179ad3a789b3",
         "skapadTS": "2025-12-17T11:10:58.188074631Z",
         "avslutadTS": null,
-        "kundbehovsspecifikation": {
+        "handlaggningspecifikation": {
           "id": "91bb9388-da7d-47ce-92bb-18ab31982fac",
           "version": "1.0",
           "bpmn": "VAH",

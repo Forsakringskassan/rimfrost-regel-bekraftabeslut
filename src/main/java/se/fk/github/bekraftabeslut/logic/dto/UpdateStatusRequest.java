@@ -7,7 +7,7 @@ import se.fk.rimfrost.framework.regel.logic.dto.UppgiftStatus;
 @Value.Immutable
 public interface UpdateStatusRequest
 {
-   UUID kundbehovsflodeId();
+   UUID handlaggningId();
 
    UUID uppgiftId();
 

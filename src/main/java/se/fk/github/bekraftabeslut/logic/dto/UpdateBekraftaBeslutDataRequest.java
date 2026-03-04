@@ -8,7 +8,7 @@ import org.immutables.value.Value;
 public interface UpdateBekraftaBeslutDataRequest
 {
 
-   UUID kundbehovsflodeId();
+   UUID handlaggningId();
 
    UUID uppgiftId();
 
