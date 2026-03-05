@@ -2,6 +2,12 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 0.0.6 (2026-03-05)
+
+### Bug Fixes
+
+-  topic name bekraftabeslut ist för bekrafta-beslut ([f1c76](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/f1c760024447165) Ulf Slunga)  
+
 ## 0.0.5 (2026-03-04)
 
 ### Bug Fixes
