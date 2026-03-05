@@ -165,21 +165,21 @@ class BekraftaBeslutTest
 
    private GetDataResponse sendGetBekraftaBeslut(String handlaggningId)
    {
-      return given().when().get("/regel/bekrafta-beslut/{handlaggningId}", handlaggningId).then().statusCode(200).extract()
+      return given().when().get("/regel/bekraftabeslut/{handlaggningId}", handlaggningId).then().statusCode(200).extract()
             .as(GetDataResponse.class);
    }
 
    private void sendPatchBekraftaBeslut(String handlaggningId, PatchDataRequest patchDataRequest)
    {
       given().contentType(ContentType.JSON).body(patchDataRequest).when()
-            .patch("/regel/bekrafta-beslut/{handlaggningId}/ersattning/{ersattningId}", handlaggningId,
+            .patch("/regel/bekraftabeslut/{handlaggningId}/ersattning/{ersattningId}", handlaggningId,
                   patchDataRequest.getErsattningId())
             .then().statusCode(204);
    }
 
    private void sendPostBekraftaBeslut(String handlaggningId)
    {
-      given().when().post("/regel/bekrafta-beslut/{handlaggningId}/done", handlaggningId).then().statusCode(204);
+      given().when().post("/regel/bekraftabeslut/{handlaggningId}/done", handlaggningId).then().statusCode(204);
    }
 
    @ParameterizedTest

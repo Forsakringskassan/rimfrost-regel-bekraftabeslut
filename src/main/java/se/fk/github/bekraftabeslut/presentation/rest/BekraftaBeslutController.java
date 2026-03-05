@@ -17,7 +17,7 @@ import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generat
 import se.fk.rimfrost.framework.regel.manuell.presentation.rest.RegelManuellController;
 
 @ApplicationScoped
-@Path("/regel/bekrafta-beslut")
+@Path("/regel/bekraftabeslut")
 public class BekraftaBeslutController extends RegelManuellController implements RegelBekraftaBeslutControllerApi
 {
 
