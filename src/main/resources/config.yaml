@@ -1,11 +1,12 @@
 uppgift:
-  version: 1.0
+  id: 10386a9e-cee0-454f-89ba-f16abf5052f2
+  version: 1
   path: /regel/bekraftabeslut
   aktivitet: "Bekräfta beslut"
 
 specifikation:
   id: a42ffaed-2f20-47e8-8499-f2f79ae2f45e
-  version: 1.0
+  version: 1
   namn: "Bekräfta beslut"
   uppgiftbeskrivning: "Bekräfta beslut"
   verksamhetslogik: B
@@ -15,13 +16,13 @@ specifikation:
 
 regel:
   id: a11f3429-3a6b-4389-ba1c-c2747b0fb45a
-  version: 1.0
+  version: 1
   namn: "Bekräfta beslut"
   beskrivning: "Bekräfta beslut"
 
 lagrum:
   id: f0c927a9-b995-4a12-b4fd-4bcbf4281b43
-  version: 1.0
+  version: 1
   giltigFom: 2010-02-11
   forfattning: "Husdjursbalken"
   kapitel: 3
