@@ -1,78 +1,84 @@
 package se.fk.github.bekraftabeslut.logic;
 
 import java.util.ArrayList;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.enterprise.context.ApplicationScoped;
-import se.fk.github.bekraftabeslut.logic.dto.ImmutableErsattning;
-import se.fk.github.bekraftabeslut.logic.dto.ImmutableGetBekraftaBeslutDataResponse;
-import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse;
-import se.fk.github.bekraftabeslut.logic.dto.GetBekraftaBeslutDataResponse.Ersattning;
 import se.fk.rimfrost.framework.arbetsgivare.adapter.dto.ArbetsgivareResponse;
 import se.fk.rimfrost.framework.folkbokford.adapter.dto.FolkbokfordResponse;
-import se.fk.rimfrost.framework.handlaggning.adapter.dto.HandlaggningResponse;
-import se.fk.rimfrost.framework.regel.logic.entity.ErsattningData;
-import se.fk.rimfrost.framework.regel.manuell.logic.entity.RegelData;
+import se.fk.rimfrost.framework.handlaggning.model.Handlaggning;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Anstallning;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Ersattning;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Kund;
 
 @ApplicationScoped
 public class BekraftaBeslutMapper
 {
-
-   public GetBekraftaBeslutDataResponse toBekraftaBeslutResponse(HandlaggningResponse handlaggningsResponse,
+   public GetDataResponse toBekraftaBeslutResponse(Handlaggning handlaggningsResponse,
          FolkbokfordResponse folkbokfordResponse,
          ArbetsgivareResponse arbetsgivareResponse,
-         RegelData regelData)
+         ObjectMapper objectMapper) throws JsonProcessingException
    {
       var ersattningsList = new ArrayList<Ersattning>();
+      var ersattningResult = handlaggningsResponse.yrkande().produceradeResultat().stream()
+            .filter(pr -> pr.typ().equalsIgnoreCase("ersattning")).toList();
 
-      for (var yrkandeErsattning : handlaggningsResponse.ersattning())
+      for (var yrkandeErsattning : ersattningResult)
       {
-         ErsattningData bekraftaBeslutErsattning = regelData.ersattningar().stream()
-               .filter(e -> e.id().equals(yrkandeErsattning.ersattningsId()))
-               .findFirst()
-               .orElseThrow(() -> new IllegalArgumentException("ErsattningData not found"));
+         var data = objectMapper.readValue(yrkandeErsattning.data(), se.fk.github.bekraftabeslut.logic.entity.Ersattning.class);
 
-         var ersattning = ImmutableErsattning.builder()
-               .belopp(yrkandeErsattning.belopp())
-               .berakningsgrund(yrkandeErsattning.berakningsgrund())
-               .ersattningsId(yrkandeErsattning.ersattningsId())
-               .ersattningsTyp(yrkandeErsattning.ersattningsTyp())
-               .from(yrkandeErsattning.franOchMed())
-               .tom(yrkandeErsattning.tillOchMed())
-               .avslagsanledning(bekraftaBeslutErsattning.avslagsanledning())
-               .omfattningsProcent(yrkandeErsattning.omfattningsProcent());
+         var ersattning = new Ersattning();
+         ersattning.setErsattningId(yrkandeErsattning.id());
+         ersattning.setErsattningstyp(data.ersattningstyp());
+         ersattning.setOmfattningProcent(data.omfattningProcent());
+         ersattning.setBelopp(data.belopp());
+         ersattning.setBerakningsgrund(data.berakningsgrund());
+         ersattning.setBeslutsutfall(data.beslutsutfall());
+         ersattning.setAvslagsanledning(yrkandeErsattning.avslagsanledning());
+         ersattning.setFrom(yrkandeErsattning.resultatFrom().toLocalDate());
+         ersattning.setTom(yrkandeErsattning.resultatTom().toLocalDate());
 
-         if (bekraftaBeslutErsattning.beslutsutfall() != null)
-         {
-            ersattning.beslutsutfall(bekraftaBeslutErsattning.beslutsutfall());
-         }
-
-         ersattningsList.add(ersattning.build());
+         ersattningsList.add(ersattning);
       }
 
-      var builder = ImmutableGetBekraftaBeslutDataResponse.builder()
-            .handlaggningId(handlaggningsResponse.handlaggningId())
-            .ersattning(ersattningsList);
+      Kund kund = new Kund();
 
       if (folkbokfordResponse != null)
       {
-         builder
-               .fornamn(folkbokfordResponse.fornamn())
-               .efternamn(folkbokfordResponse.efternamn())
-               .kon(folkbokfordResponse.kon().toString());
+         kund.setFornamn(folkbokfordResponse.fornamn());
+         kund.setEfternamn(folkbokfordResponse.efternamn());
+         kund.setKon(mapKonEnum(folkbokfordResponse.kon()));
       }
 
       if (arbetsgivareResponse != null)
       {
-         builder
-               .anstallningsdag(arbetsgivareResponse.anstallningsdag())
-               .sistaAnstallningsdag(arbetsgivareResponse.sistaAnstallningsdag())
-               .arbetstidProcent(arbetsgivareResponse.arbetstidProcent())
-               .loneSumma(40000) //TODO: Replace when salary is available in api response
-               .lonFrom(arbetsgivareResponse.anstallningsdag()) // TODO: Replace when salary start date is available in api response
-               .lonTom(arbetsgivareResponse.anstallningsdag()) // TODO: Replace when salary end date is available in api response
-               .organisationsnamn(arbetsgivareResponse.organisationsnamn())
-               .organisationsnummer(arbetsgivareResponse.organisationsnummer());
+         Anstallning anstallning = new Anstallning();
+         anstallning.setAnstallningsdag(arbetsgivareResponse.anstallningsdag());
+         anstallning.setAnstallningsdag(arbetsgivareResponse.anstallningsdag());
+         anstallning.setArbetstidProcent(arbetsgivareResponse.arbetstidProcent());
+         anstallning.setSistaAnstallningsdag(arbetsgivareResponse.sistaAnstallningsdag());
+         anstallning.setOrganisationsnamn(arbetsgivareResponse.organisationsnamn());
+         anstallning.setOrganisationsnummer(arbetsgivareResponse.organisationsnummer());
+
+         kund.setAnstallning(anstallning);
       }
-      return builder.build();
+
+      GetDataResponse getDataResponse = new GetDataResponse();
+      getDataResponse.handlaggningId(handlaggningsResponse.id());
+      getDataResponse.setErsattning(ersattningsList);
+      getDataResponse.setKund(kund);
+
+      return getDataResponse;
    }
 
+   private Kund.KonEnum mapKonEnum(FolkbokfordResponse.Kon kon)
+   {
+      return switch (kon) {
+         case MAN -> Kund.KonEnum.MAN;
+         case KVINNA -> Kund.KonEnum.KVINNA;
+         default -> throw new IllegalStateException("Unexpected value: " + kon);
+      };
+   }
 }

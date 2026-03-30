@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/individ/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "id": "24c5e26d-18f3-4552-9cb5-4a52702e465f",
+      "typ": "Pnr",
+      "varde": "19990101-1234"
+    }
+  }
+}

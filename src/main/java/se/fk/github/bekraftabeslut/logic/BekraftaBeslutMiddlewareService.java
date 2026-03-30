@@ -1,14 +1,11 @@
-package se.fk.github.bekraftabeslut.presentation.rest;
+package se.fk.github.bekraftabeslut.logic;
 
-import jakarta.ws.rs.*;
 import jakarta.enterprise.context.ApplicationScoped;
+import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellMiddlewareService;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
-import se.fk.rimfrost.framework.regel.manuell.presentation.rest.RegelManuellController;
 
 @ApplicationScoped
-@Path("/regel/bekraftabeslut")
-public class BekraftaBeslutController extends RegelManuellController<GetDataResponse, PatchDataRequest>
+public class BekraftaBeslutMiddlewareService extends RegelManuellMiddlewareService<GetDataResponse, PatchDataRequest>
 {
-
 }
