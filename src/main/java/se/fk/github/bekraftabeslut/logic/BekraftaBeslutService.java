@@ -2,7 +2,6 @@ package se.fk.github.bekraftabeslut.logic;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.quarkus.runtime.Startup;
-import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -23,7 +22,6 @@ import se.fk.rimfrost.framework.individ.adapter.IndividAdapter;
 import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceBase;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceInterface;
-import se.fk.rimfrost.framework.regel.manuell.storage.entity.ImmutableManuellRegelCommonData;
 import se.fk.rimfrost.framework.yrkanderoll.adapter.YrkanderollAdapter;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
@@ -101,19 +99,10 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .addProduceradeResultat(updatedErsattningResult)
             .build();
 
-      var updatedHandlaggningUpdate = ImmutableHandlaggningUpdate.builder()
+      return ImmutableHandlaggningUpdate.builder()
             .from(handlaggningUpdate)
             .yrkande(updatedYrkande)
             .build();
-
-      var commonData = dataStorage.getManuellRegelCommonData(updatedHandlaggningUpdate.id());
-      var updatedCommonData = ImmutableManuellRegelCommonData.builder()
-            .from(commonData)
-            .handlaggningUpdate(updatedHandlaggningUpdate)
-            .build();
-      dataStorage.setManuellRegelCommonData(updatedHandlaggningUpdate.id(), updatedCommonData);
-
-      return updatedHandlaggningUpdate;
    }
 
    @Override
