@@ -94,9 +94,12 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .yrkandeStatus(mapYrkandestatus(request.getYrkandestatus()))
             .build();
 
+      var updatedProduceradeResultat = handlaggningUpdate.yrkande().produceradeResultat().stream()
+            .map(pr -> pr.id().equals(updatedErsattningResult.id()) ? updatedErsattningResult : pr).toList();
+
       var updatedYrkande = ImmutableYrkande.builder()
             .from(handlaggningUpdate.yrkande())
-            .addProduceradeResultat(updatedErsattningResult)
+            .produceradeResultat(updatedProduceradeResultat)
             .build();
 
       return ImmutableHandlaggningUpdate.builder()
