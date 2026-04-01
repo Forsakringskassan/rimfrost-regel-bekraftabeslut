@@ -22,6 +22,7 @@ import se.fk.rimfrost.adapter.yrkanderoll.adapter.YrkanderollAdapter;
 import se.fk.rimfrost.framework.handlaggning.adapter.HandlaggningAdapter;
 import se.fk.rimfrost.framework.handlaggning.model.*;
 import se.fk.rimfrost.framework.regel.Utfall;
+import se.fk.rimfrost.framework.regel.logic.RegelUtils;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceBase;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceInterface;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
@@ -95,13 +96,8 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .yrkandeStatus(mapYrkandestatus(request.getYrkandestatus()))
             .build();
 
-      var updatedProduceradeResultat = handlaggningUpdate.yrkande().produceradeResultat().stream()
-            .map(pr -> pr.id().equals(updatedErsattningResult.id()) ? updatedErsattningResult : pr).toList();
-
-      var updatedYrkande = ImmutableYrkande.builder()
-            .from(handlaggningUpdate.yrkande())
-            .produceradeResultat(updatedProduceradeResultat)
-            .build();
+      var updatedYrkande = RegelUtils.createYrkandeWithUpdatedProduceradeResultat(handlaggningUpdate.yrkande(),
+            List.of(updatedErsattningResult));
 
       return ImmutableHandlaggningUpdate.builder()
             .from(handlaggningUpdate)
