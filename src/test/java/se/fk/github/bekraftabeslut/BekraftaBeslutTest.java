@@ -248,9 +248,9 @@ class BekraftaBeslutTest
       //
       // verify that rule performed requests to handlaggning
       //
-      handlaggningRequests = waitForWireMockRequest(wiremockServer, handlaggningEndpoint + handlaggningId, 1);
+      handlaggningRequests = waitForWireMockRequest(wiremockServer, handlaggningEndpoint + handlaggningId, 4);
       var putRequests = handlaggningRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
-      assertEquals(1, putRequests.size());
+      assertEquals(2, putRequests.size());
       var sentJson = putRequests.getLast().getBodyAsString();
       var sentPutHandlaggningRequest = mapper.readValue(sentJson, PutHandlaggningRequest.class);
       assertEquals(UppgiftStatus.AVSLUTAD, sentPutHandlaggningRequest.getHandlaggning().getUppgift().getUppgiftStatus());
