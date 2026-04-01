@@ -5,6 +5,7 @@ import io.quarkus.runtime.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -112,6 +113,19 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    public void done(UUID handlaggningId)
    {
       var handlaggning = handlaggningAdapter.readHandlaggning(handlaggningId);
+
+      var beslut = createBeslut();
+
+      var updatedYrkande = ImmutableYrkande.builder()
+            .from(handlaggning.yrkande())
+            .beslut(beslut)
+            .build();
+
+      var handlaggningUpdate = ImmutableHandlaggningUpdate.builder()
+            .from(createHandlaggningUpdate(handlaggning))
+            .yrkande(updatedYrkande)
+            .build();
+
       var ersattningResultats = handlaggning.yrkande().produceradeResultat().stream()
             .filter(pr -> pr.typ().equalsIgnoreCase("ersattning")).toList();
 
@@ -122,6 +136,8 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       }
 
       var utfall = ersattningar.stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA) ? Utfall.JA : Utfall.NEJ;
+
+      handlaggningAdapter.updateHandlaggning(handlaggningUpdate);
       sendRegelResponse(handlaggningId, utfall);
    }
 
@@ -138,6 +154,25 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .avslutadTS(handlaggning.avslutadTS())
             .handlaggningspecifikationId(handlaggning.handlaggningspecifikationId())
             .uppgift(commonData.uppgift())
+            .build();
+   }
+
+   private Beslut createBeslut()
+   {
+      var beslutsrad = ImmutableBeslutsrad.builder()
+            .id(UUID.randomUUID())
+            .version(1)
+            .avslutsTyp(UUID.randomUUID()) // TODO: Set to correct value when available
+            .beslutsTyp(UUID.randomUUID()) // TODO: Set to correct value when available
+            .beslutsUtfall(UUID.randomUUID()) // TODO: Set to correct value when available
+            .build();
+
+      return ImmutableBeslut.builder()
+            .id(UUID.randomUUID())
+            .version(1)
+            .datum(OffsetDateTime.now())
+            .beslutsfattare(UUID.randomUUID()) // TODO: Set to id for handlaggare when available
+            .beslutsrader(List.of(beslutsrad))
             .build();
    }
 
