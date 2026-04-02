@@ -110,7 +110,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    {
       var handlaggning = handlaggningAdapter.readHandlaggning(handlaggningId);
 
-      var beslut = createBeslut();
+      var beslut = createBeslut(handlaggning.yrkande().produceradeResultat());
 
       var updatedYrkande = ImmutableYrkande.builder()
             .from(handlaggning.yrkande())
@@ -153,14 +153,19 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .build();
    }
 
-   private Beslut createBeslut()
+   private Beslut createBeslut(List<ProduceratResultat> produceratResultat)
    {
+      List<ProduceratResultatRef> beslutsref = produceratResultat.stream()
+            .map(pr -> (ProduceratResultatRef) ImmutableProduceratResultatRef.builder().id(pr.id()).version(pr.version()).build())
+            .toList();
+
       var beslutsrad = ImmutableBeslutsrad.builder()
             .id(UUID.randomUUID())
             .version(1)
             .avslutsTyp(UUID.randomUUID()) // TODO: Set to correct value when available
             .beslutsTyp(UUID.randomUUID()) // TODO: Set to correct value when available
             .beslutsUtfall(UUID.randomUUID()) // TODO: Set to correct value when available
+            .produceradeResultatRef(beslutsref)
             .build();
 
       return ImmutableBeslut.builder()
