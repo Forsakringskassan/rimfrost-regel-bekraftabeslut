@@ -2,6 +2,22 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 0.0.8 (2026-04-02)
+
+### Bug Fixes
+
+-  Bump rimfrost-framework-regel-manuell version ([39392](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/39392529516b8d7) Lars Persson)  
+-  added produceratresultatrefs ([605b4](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/605b4c1018861ac) Nils Elveros)  
+-  bump version ([0a468](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/0a4684ae3451fee) Nils Elveros)  
+-  Bump rimfrost-framework-regel-manuell version ([f0ae3](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/f0ae3d076bd3bbd) Lars Persson)  
+-  Use non-framework version of adapters ([77dd5](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/77dd5414f96146c) Lars Persson)  
+-  Add support for sending beslut ([83935](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/839354b8e4edbee) Lars Persson)  
+-  Replace existing object with updated object in ProduceradeResultat ([b9485](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/b948539a48c55a5) Lars Persson)  
+-  **deps**  update dependency se.fk.maven:fk-maven-quarkus-parent to v1.12.0 ([a07fc](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/a07fc4d4dd8deff) renovate[bot])  
+-  Bump framework version ([be74f](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/be74f70a3820e66) Lars Persson)  
+-  Bump framework version ([1b8bf](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/1b8bf2db187187e) Lars Persson)  
+-  **deps**  update dependency org.yaml:snakeyaml to v2.6 ([9af7e](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/9af7e5a9ab9c69b) renovate[bot])  
+
 ## 0.0.7 (2026-03-05)
 
 ### Bug Fixes
