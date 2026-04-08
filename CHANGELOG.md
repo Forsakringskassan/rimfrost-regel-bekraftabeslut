@@ -2,6 +2,12 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 0.0.9 (2026-04-08)
+
+### Bug Fixes
+
+-  correct url ([eea8c](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/eea8c9380d4e08a) Nils Elveros)  
+
 ## 0.0.8 (2026-04-02)
 
 ### Bug Fixes
