@@ -1,0 +1,29 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/avslutstyp"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "dcfb24d5-b0a9-4519-86e5-aece09d85ca9",
+        "kod": "AVVISNING",
+        "namn": "Avvisning"
+      },
+      {
+        "id": "01ea4c9f-50da-4b99-8fc3-6aee6f4b506d",
+        "kod": "AVSKRIVNING",
+        "namn": "Avskrivning"
+      },
+      {
+        "id": "b1364919-6002-4e37-a759-556bd2ec4bfd",
+        "kod": "PROVAD",
+        "namn": "Sakfråga"
+      }
+    ]
+  }
+}

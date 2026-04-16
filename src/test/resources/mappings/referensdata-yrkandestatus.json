@@ -1,0 +1,29 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/yrkandestatus"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "680e774e-f4f6-4158-9214-32f293a300aa",
+        "kod": "PLANERAT",
+        "namn": "Planerat"
+      },
+      {
+        "id": "d07c1851-ad48-4333-abab-57d5507f0088",
+        "kod": "YRKAT",
+        "namn": "Yrkat"
+      },
+      {
+        "id": "16bd3d95-8fad-4f9c-a87a-ba146db55c9b",
+        "kod": "FASTSTALLT",
+        "namn": "Fastställt"
+      }
+    ]
+  }
+}

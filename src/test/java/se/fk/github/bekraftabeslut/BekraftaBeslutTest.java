@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import se.fk.rimfrost.Idtyp;
 import se.fk.rimfrost.OperativtUppgiftslagerRequestMessage;
 import se.fk.rimfrost.OperativtUppgiftslagerResponseMessage;
 import se.fk.rimfrost.OperativtUppgiftslagerStatusMessage;
@@ -30,10 +31,11 @@ import se.fk.rimfrost.framework.regel.RegelRequestMessagePayloadData;
 import se.fk.rimfrost.framework.regel.RegelResponseMessagePayload;
 import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutHandlaggningRequest;
-import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.UppgiftStatus;
+import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.Referensdata;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslut;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
-import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Yrkandestatus;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.UpdateErsattning;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -171,6 +173,30 @@ class BekraftaBeslutTest
             .as(GetDataResponse.class);
    }
 
+   private List<Referensdata> sendGetYrkandestatus()
+   {
+      return given().when().get("/regel/bekraftabeslut/yrkandestatus").then().statusCode(200).extract().body().jsonPath()
+            .getList(".", Referensdata.class);
+   }
+
+   private List<Referensdata> sendGetAvslutstyp()
+   {
+      return given().when().get("/regel/bekraftabeslut/avslutstyp").then().statusCode(200).extract().body().jsonPath()
+            .getList(".", Referensdata.class);
+   }
+
+   private List<Referensdata> sendGetBeslutstyp()
+   {
+      return given().when().get("/regel/bekraftabeslut/beslutstyp").then().statusCode(200).extract().body().jsonPath()
+            .getList(".", Referensdata.class);
+   }
+
+   private List<Referensdata> sendGetBeslutsutfallstyp()
+   {
+      return given().when().get("/regel/bekraftabeslut/beslutsutfallstyp").then().statusCode(200).extract().body().jsonPath()
+            .getList(".", Referensdata.class);
+   }
+
    private void sendPatchBekraftaBeslut(String handlaggningId, PatchDataRequest patchDataRequest)
    {
       given().contentType(ContentType.JSON).body(patchDataRequest).when()
@@ -181,6 +207,16 @@ class BekraftaBeslutTest
    private void sendPostBekraftaBeslut(String handlaggningId)
    {
       given().when().post("/regel/bekraftabeslut/{handlaggningId}/done", handlaggningId).then().statusCode(204);
+   }
+
+   private void verifyReferensdataList(List<Referensdata> referensdataList, List<String> expectedIdsList)
+   {
+      assertEquals(expectedIdsList.size(), referensdataList.size());
+
+      for (int i = 0; i < expectedIdsList.size(); i++)
+      {
+         assertEquals(expectedIdsList.get(i), referensdataList.get(i).getId());
+      }
    }
 
    @ParameterizedTest
@@ -219,11 +255,15 @@ class BekraftaBeslutTest
       //
       // mock status update from OUL
       //
+      Idtyp utforare = new Idtyp();
+      utforare.setTypId(UUID.randomUUID().toString());
+      utforare.setVarde(UUID.randomUUID().toString());
+
       OperativtUppgiftslagerStatusMessage oulStatusMessage = new OperativtUppgiftslagerStatusMessage();
       oulStatusMessage.setStatus(Status.NY);
       oulStatusMessage.setUppgiftId(oulResponseMessage.getUppgiftId());
       oulStatusMessage.setHandlaggningId(handlaggningId);
-      oulStatusMessage.setUtforarId("383cc515-4c55-479b-a96b-244734ef1336");
+      oulStatusMessage.setUtforarId(utforare);
       inMemoryConnector.source(oulStatusNotificationChannel).send(oulStatusMessage);
       //
       // mock GET operation requested from portal FE
@@ -234,11 +274,56 @@ class BekraftaBeslutTest
       //
       assertEquals(handlaggningId, getBekraftaBeslutResponse.getHandlaggningId().toString());
       //
+      // mock GET operation from rule FE for yrkandestatus list
+      //
+      var yrkandestatusList = sendGetYrkandestatus();
+      //
+      // Verify yrkandestatus list content
+      //
+      verifyReferensdataList(yrkandestatusList, List.of("680e774e-f4f6-4158-9214-32f293a300aa",
+            "d07c1851-ad48-4333-abab-57d5507f0088", "16bd3d95-8fad-4f9c-a87a-ba146db55c9b"));
+      //
+      // mock GET operation from rule FE for avslutstyp list
+      //
+      var avslutstypList = sendGetAvslutstyp();
+      //
+      // Verify avslutstyp list content
+      //
+      verifyReferensdataList(avslutstypList, List.of("dcfb24d5-b0a9-4519-86e5-aece09d85ca9",
+            "01ea4c9f-50da-4b99-8fc3-6aee6f4b506d", "b1364919-6002-4e37-a759-556bd2ec4bfd"));
+      //
+      // mock GET operation from rule FE for beslutstyp list
+      //
+      var beslutstypList = sendGetBeslutstyp();
+      //
+      // Verify beslutstyp list content
+      //
+      verifyReferensdataList(beslutstypList, List.of("c61bf2cd-3f11-4629-8bc2-6ab9ca72666a",
+            "e44d5e15-5231-4857-b992-5b8d9c34e36f", "04ece3fc-9015-412e-b48f-eb3ac6d6c846"));
+      //
+      // mock GET operation from rule FE for beslutsutfallstyp list
+      //
+      var beslutsutfallList = sendGetBeslutsutfallstyp();
+      //
+      // Verify beslutsutfallstyp list content
+      //
+      verifyReferensdataList(beslutsutfallList, List.of("f011934d-d05e-404d-95ab-24571eec241b",
+            "1429cc69-1e9d-49be-be41-8e5e4e05a0f9", "5922e22f-4872-4757-938c-5925ef650742"));
+      //
       // mock PATCH operation from portal FE
       //
+      UpdateErsattning updateErsattning = new UpdateErsattning();
+      updateErsattning.setYrkandestatus("ff483a54-0909-4947-b0ec-a0618b861e70"); // FASTSTÄLLT
+      updateErsattning.setErsattningId(UUID.fromString("bc6e5150-29be-4758-a2ee-e241f1d7ccf7"));
+
+      Beslut beslut = new Beslut();
+      beslut.setAvslutstyp("0b9c0048-34a1-4b69-ace7-1e68fe33c2de");
+      beslut.setBeslutstyp("856cbfb3-c1c7-480e-94ee-42b7291848ca");
+      beslut.setBeslutsutfall("459bfc9e-c0d4-40d8-b9b5-56ec0801332c");
+
       PatchDataRequest patchDataRequest = new PatchDataRequest();
-      patchDataRequest.setYrkandestatus(Yrkandestatus.FASTSTALLT);
-      patchDataRequest.setErsattningId(UUID.fromString("bc6e5150-29be-4758-a2ee-e241f1d7ccf7"));
+      patchDataRequest.setErsattningar(List.of(updateErsattning));
+      patchDataRequest.setBeslut(beslut);
       sendPatchBekraftaBeslut(handlaggningId, patchDataRequest);
       wiremockServer.resetRequests();
       //
@@ -251,9 +336,13 @@ class BekraftaBeslutTest
       handlaggningRequests = waitForWireMockRequest(wiremockServer, handlaggningEndpoint + handlaggningId, 4);
       var putRequests = handlaggningRequests.stream().filter(p -> p.getMethod().equals(RequestMethod.PUT)).toList();
       assertEquals(2, putRequests.size());
-      var sentJson = putRequests.getLast().getBodyAsString();
-      var sentPutHandlaggningRequest = mapper.readValue(sentJson, PutHandlaggningRequest.class);
-      assertEquals(UppgiftStatus.AVSLUTAD, sentPutHandlaggningRequest.getHandlaggning().getUppgift().getUppgiftStatus());
+      var regelSentJson = putRequests.getFirst().getBodyAsString();
+      var frameworkSentJson = putRequests.getLast().getBodyAsString();
+      var regelSentPutHandlaggningRequest = mapper.readValue(regelSentJson, PutHandlaggningRequest.class);
+      var frameworkSentPutHandlaggningRequest = mapper.readValue(frameworkSentJson, PutHandlaggningRequest.class);
+      assertEquals("16bd3d95-8fad-4f9c-a87a-ba146db55c9b",
+            regelSentPutHandlaggningRequest.getHandlaggning().getYrkande().getYrkandestatus());
+      assertEquals("3", frameworkSentPutHandlaggningRequest.getHandlaggning().getUppgift().getUppgiftStatus());
       wiremockServer.resetRequests();
       //
       // verify kafka status message sent to oul

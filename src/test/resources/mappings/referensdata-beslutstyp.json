@@ -1,0 +1,29 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/beslutstyp"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "c61bf2cd-3f11-4629-8bc2-6ab9ca72666a",
+        "kod": "INTERIMISTISKT",
+        "namn": "Interimistiskt beslut"
+      },
+      {
+        "id": "e44d5e15-5231-4857-b992-5b8d9c34e36f",
+        "kod": "SLUTGILTIGT",
+        "namn": "Slutgiltigt beslut"
+      },
+      {
+        "id": "04ece3fc-9015-412e-b48f-eb3ac6d6c846",
+        "kod": "ANDRING",
+        "namn": "Ändringsbeslut"
+      }
+    ]
+  }
+}
