@@ -37,7 +37,7 @@
               "tom": "2025-01-10T16:15:50Z",
               "yrkandestatus": "665841b9-4f7d-41cc-b11a-b243069bcea1",
               "typ": "ersattning",
-              "data": "{\"belopp\":40000,\"berakningsgrund\":0,\"ersattningstyp\":\"HUNDBIDRAG\",\"omfattningProcent\":100,\"beslutsutfall\":\"JA\"}"
+              "data": "{\"belopp\":40000,\"berakningsgrund\":0,\"ersattningstyp\":{\"id\":\"042bd313-d5ef-4886-97c5-e0a1c828baca\", \"namn\":\"HUNDBIDRAG\"},\"omfattningProcent\":100,\"beslutsutfall\":\"JA\"}"
             }
           ]
         },

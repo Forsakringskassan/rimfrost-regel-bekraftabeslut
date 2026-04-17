@@ -7,15 +7,12 @@ import jakarta.inject.Inject;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 import se.fk.github.bekraftabeslut.logic.entity.Beslutsdata;
-import se.fk.github.bekraftabeslut.logic.entity.Ersattning;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableBeslutsdata;
 import se.fk.github.bekraftabeslut.storage.BekraftaBeslutDataStorage;
 import se.fk.rimfrost.adapter.arbetsgivare.ArbetsgivareAdapter;
@@ -24,6 +21,7 @@ import se.fk.rimfrost.adapter.folkbokford.FolkbokfordAdapter;
 import se.fk.rimfrost.adapter.folkbokford.dto.ImmutableFolkbokfordRequest;
 import se.fk.rimfrost.adapter.referensdata.adapter.ReferensdataAdapter;
 import se.fk.rimfrost.adapter.referensdata.model.Referensdata;
+import se.fk.rimfrost.ersattningdata.ErsattningData;
 import se.fk.rimfrost.framework.handlaggning.adapter.HandlaggningAdapter;
 import se.fk.rimfrost.framework.handlaggning.model.*;
 import se.fk.rimfrost.framework.regel.Utfall;
@@ -133,13 +131,15 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       var ersattningResultats = handlaggning.yrkande().produceradeResultat().stream()
             .filter(pr -> pr.typ().equalsIgnoreCase("ersattning")).toList();
 
-      List<Ersattning> ersattningar = new ArrayList<>();
+      List<ErsattningData> ersattningar = new ArrayList<>();
       for (var ersattningResultat : ersattningResultats)
       {
-         ersattningar.add(getErsattning(ersattningResultat).orElseThrow());
+         ersattningar.add(ErsattningData.fromJson(ersattningResultat.data(), objectMapper));
       }
 
-      var utfall = ersattningar.stream().allMatch(e -> e.beslutsutfall() == Beslutsutfall.JA) ? Utfall.JA : Utfall.NEJ;
+      var utfall = ersattningar.stream().allMatch(e -> e.getBeslutsutfall() == se.fk.rimfrost.ersattningdata.Beslutsutfall.JA)
+            ? Utfall.JA
+            : Utfall.NEJ;
 
       handlaggningAdapter.updateHandlaggning(handlaggningUpdate);
       sendRegelResponse(handlaggningId, utfall);
@@ -228,18 +228,6 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    private Optional<Referensdata> findFaststalltYrkandeStatus()
    {
       return referensdataAdapter.getYrkandestatusar().stream().filter(r -> r.kod().equalsIgnoreCase("faststallt")).findFirst();
-   }
-
-   private Optional<Ersattning> getErsattning(ProduceratResultat produceratResultat)
-   {
-      try
-      {
-         return Optional.of(objectMapper.readValue(produceratResultat.data(), Ersattning.class));
-      }
-      catch (JsonProcessingException e)
-      {
-         return Optional.empty();
-      }
    }
 
    private se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Referensdata toApiReferensdata(

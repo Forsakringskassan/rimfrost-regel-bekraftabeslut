@@ -98,6 +98,11 @@
       <artifactId>rimfrost-framework-uppgift-status-provider</artifactId>
       <version>0.0.3</version>
     </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.ersattningdata</groupId>
+      <artifactId>rimfrost-ersattning-data</artifactId>
+      <version>0.0.1</version>
+    </dependency>
   </dependencies>
 
   <repositories>
