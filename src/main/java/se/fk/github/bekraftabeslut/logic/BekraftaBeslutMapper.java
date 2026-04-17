@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.rimfrost.adapter.folkbokford.dto.FolkbokfordResponse;
+import se.fk.rimfrost.ersattningdata.ErsattningData;
 import se.fk.rimfrost.framework.handlaggning.model.Handlaggning;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Anstallning;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Ersattning;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Kund;
@@ -27,15 +29,15 @@ public class BekraftaBeslutMapper
 
       for (var yrkandeErsattning : ersattningResult)
       {
-         var data = objectMapper.readValue(yrkandeErsattning.data(), se.fk.github.bekraftabeslut.logic.entity.Ersattning.class);
+         var data = ErsattningData.fromJson(yrkandeErsattning.data(), objectMapper);
 
          var ersattning = new Ersattning();
          ersattning.setErsattningId(yrkandeErsattning.id());
-         ersattning.setErsattningstyp(data.ersattningstyp());
-         ersattning.setOmfattningProcent(data.omfattningProcent());
-         ersattning.setBelopp(data.belopp());
-         ersattning.setBerakningsgrund(data.berakningsgrund());
-         ersattning.setBeslutsutfall(data.beslutsutfall());
+         ersattning.setErsattningstyp(data.getErsattningstyp().id());
+         ersattning.setOmfattningProcent(data.getOmfattningProcent());
+         ersattning.setBelopp(data.getBelopp());
+         ersattning.setBerakningsgrund(data.getBerakningsgrund());
+         ersattning.setBeslutsutfall(mapBeslutsutfallEnum(data.getBeslutsutfall()));
          ersattning.setAvslagsanledning(yrkandeErsattning.avslagsanledning());
          ersattning.setFrom(yrkandeErsattning.resultatFrom().toLocalDate());
          ersattning.setTom(yrkandeErsattning.resultatTom().toLocalDate());
@@ -79,6 +81,16 @@ public class BekraftaBeslutMapper
          case MAN -> Kund.KonEnum.MAN;
          case KVINNA -> Kund.KonEnum.KVINNA;
          default -> throw new IllegalStateException("Unexpected value: " + kon);
+      };
+   }
+
+   private Beslutsutfall mapBeslutsutfallEnum(se.fk.rimfrost.ersattningdata.Beslutsutfall beslutsutfall)
+   {
+      return switch(beslutsutfall) {
+         case JA -> Beslutsutfall.JA;
+         case NEJ -> Beslutsutfall.NEJ;
+         case FU -> Beslutsutfall.FU;
+         default -> throw new IllegalStateException("Unexpected value: " + beslutsutfall);
       };
    }
 }
