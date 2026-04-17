@@ -71,12 +71,12 @@
     <dependency>
       <groupId>se.fk.rimfrost.regel.bekraftabeslut.openapi</groupId>
       <artifactId>rimfrost-regel-bekraftabeslut-openapi-jaxrs-spec</artifactId>
-      <version>0.0.4</version>
+      <version>0.0.6</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>0.2.7</version>
+      <version>0.2.9</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.arbetsgivare</groupId>
@@ -89,13 +89,13 @@
       <version>0.0.3</version>
     </dependency>
     <dependency>
-      <groupId>se.fk.rimfrost.adapter.individ</groupId>
-      <artifactId>rimfrost-adapter-individ</artifactId>
-      <version>0.0.2</version>
+      <groupId>se.fk.rimfrost.adapter.referensdata</groupId>
+      <artifactId>rimfrost-adapter-referensdata</artifactId>
+      <version>0.0.1</version>
     </dependency>
     <dependency>
-      <groupId>se.fk.rimfrost.adapter.yrkanderoll</groupId>
-      <artifactId>rimfrost-adapter-yrkanderoll</artifactId>
+      <groupId>se.fk.rimfrost.framework.uppgiftstatusprovider</groupId>
+      <artifactId>rimfrost-framework-uppgift-status-provider</artifactId>
       <version>0.0.3</version>
     </dependency>
   </dependencies>

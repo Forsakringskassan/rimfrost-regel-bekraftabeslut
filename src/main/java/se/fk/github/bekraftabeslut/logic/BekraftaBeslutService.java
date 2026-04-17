@@ -7,18 +7,23 @@ import jakarta.inject.Inject;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import se.fk.github.bekraftabeslut.logic.entity.Beslutsdata;
 import se.fk.github.bekraftabeslut.logic.entity.Ersattning;
+import se.fk.github.bekraftabeslut.logic.entity.ImmutableBeslutsdata;
 import se.fk.github.bekraftabeslut.storage.BekraftaBeslutDataStorage;
 import se.fk.rimfrost.adapter.arbetsgivare.ArbetsgivareAdapter;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ImmutableArbetsgivareRequest;
 import se.fk.rimfrost.adapter.folkbokford.FolkbokfordAdapter;
 import se.fk.rimfrost.adapter.folkbokford.dto.ImmutableFolkbokfordRequest;
-import se.fk.rimfrost.adapter.individ.adapter.IndividAdapter;
-import se.fk.rimfrost.adapter.yrkanderoll.adapter.YrkanderollAdapter;
+import se.fk.rimfrost.adapter.referensdata.adapter.ReferensdataAdapter;
+import se.fk.rimfrost.adapter.referensdata.model.Referensdata;
 import se.fk.rimfrost.framework.handlaggning.adapter.HandlaggningAdapter;
 import se.fk.rimfrost.framework.handlaggning.model.*;
 import se.fk.rimfrost.framework.regel.Utfall;
@@ -28,6 +33,7 @@ import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceInterface
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
+import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.UpdateErsattning;
 
 @ApplicationScoped
 @Startup
@@ -36,9 +42,6 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
 {
    @Inject
    BekraftaBeslutMapper bekraftaBeslutMapper;
-
-   @Inject
-   IndividAdapter individAdapter;
 
    @Inject
    FolkbokfordAdapter folkbokfordAdapter;
@@ -50,7 +53,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    HandlaggningAdapter handlaggningAdapter;
 
    @Inject
-   YrkanderollAdapter yrkanderollAdapter;
+   ReferensdataAdapter referensdataAdapter;
 
    @Inject
    BekraftaBeslutDataStorage dataStorage;
@@ -60,7 +63,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    {
       var yrkandeIndivid = findYrkandeIndivid(handlaggning.yrkande().individYrkandeRoller()).orElseThrow();
 
-      var individ = individAdapter.getIndivid(yrkandeIndivid.individId());
+      var individ = yrkandeIndivid.individ();
 
       var folkbokfordRequest = ImmutableFolkbokfordRequest.builder()
             .personnummer(individ.varde())
@@ -86,22 +89,28 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    public HandlaggningUpdate updateData(Handlaggning handlaggning, PatchDataRequest request)
    {
       var handlaggningUpdate = createHandlaggningUpdate(handlaggning);
-      var ersattningResult = handlaggningUpdate.yrkande().produceradeResultat().stream()
-            .filter(pr -> pr.id().equals(request.getErsattningId())).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("ErsattningData not found"));
+      var updatedErsattningar = request.getErsattningar().stream().map(e -> createUpdatedProduceratResultat(handlaggning, e))
+            .toList();
 
-      var updatedErsattningResult = ImmutableProduceratResultat.builder()
-            .from(ersattningResult)
-            .version(ersattningResult.version() + 1)
-            .yrkandeStatus(mapYrkandestatus(request.getYrkandestatus()))
+      var beslutsdata = ImmutableBeslutsdata.builder()
+            .avslutstyp(request.getBeslut().getAvslutstyp())
+            .beslutstyp(request.getBeslut().getBeslutstyp())
+            .beslutsutfall(request.getBeslut().getBeslutsutfall())
             .build();
 
+      var beslut = createBeslut(handlaggning.id(), updatedErsattningar, beslutsdata);
+
       var updatedYrkande = RegelUtils.createYrkandeWithUpdatedProduceradeResultat(handlaggningUpdate.yrkande(),
-            List.of(updatedErsattningResult));
+            updatedErsattningar);
+
+      var updatedYrkandeWithBeslut = ImmutableYrkande.builder()
+            .from(updatedYrkande)
+            .beslut(beslut)
+            .build();
 
       return ImmutableHandlaggningUpdate.builder()
             .from(handlaggningUpdate)
-            .yrkande(updatedYrkande)
+            .yrkande(updatedYrkandeWithBeslut)
             .build();
    }
 
@@ -109,12 +118,11 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    public void done(UUID handlaggningId)
    {
       var handlaggning = handlaggningAdapter.readHandlaggning(handlaggningId);
-
-      var beslut = createBeslut(handlaggning.yrkande().produceradeResultat());
+      var faststalltYrkandeStatus = findFaststalltYrkandeStatus().orElseThrow();
 
       var updatedYrkande = ImmutableYrkande.builder()
             .from(handlaggning.yrkande())
-            .beslut(beslut)
+            .yrkandeStatus(faststalltYrkandeStatus.id())
             .build();
 
       var handlaggningUpdate = ImmutableHandlaggningUpdate.builder()
@@ -137,6 +145,26 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       sendRegelResponse(handlaggningId, utfall);
    }
 
+   public List<se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Referensdata> getYrkandestatus()
+   {
+      return referensdataAdapter.getYrkandestatusar().stream().map(this::toApiReferensdata).toList();
+   }
+
+   public List<se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Referensdata> getAvslutstyp()
+   {
+      return referensdataAdapter.getAvslutstyper().stream().map(this::toApiReferensdata).toList();
+   }
+
+   public List<se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Referensdata> getBeslutstyp()
+   {
+      return referensdataAdapter.getBeslutstyper().stream().map(this::toApiReferensdata).toList();
+   }
+
+   public List<se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Referensdata> getBeslutsutfallstyp()
+   {
+      return referensdataAdapter.getBeslutsutfallstyper().stream().map(this::toApiReferensdata).toList();
+   }
+
    private HandlaggningUpdate createHandlaggningUpdate(Handlaggning handlaggning)
    {
       var commonData = dataStorage.getManuellRegelCommonData(handlaggning.id());
@@ -145,7 +173,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .id(handlaggning.id())
             .version(handlaggning.version())
             .yrkande(handlaggning.yrkande())
-            .processInstansId(handlaggning.processInstansId())
+            .processInstansId(Objects.requireNonNull(handlaggning.processInstansId()))
             .skapadTS(handlaggning.skapadTS())
             .avslutadTS(handlaggning.avslutadTS())
             .handlaggningspecifikationId(handlaggning.handlaggningspecifikationId())
@@ -153,7 +181,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .build();
    }
 
-   private Beslut createBeslut(List<ProduceratResultat> produceratResultat)
+   private Beslut createBeslut(UUID handlaggningsId, List<ProduceratResultat> produceratResultat, Beslutsdata beslutsdata)
    {
       List<ProduceratResultatRef> beslutsref = produceratResultat.stream()
             .map(pr -> (ProduceratResultatRef) ImmutableProduceratResultatRef.builder().id(pr.id()).version(pr.version()).build())
@@ -162,38 +190,31 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       var beslutsrad = ImmutableBeslutsrad.builder()
             .id(UUID.randomUUID())
             .version(1)
-            .avslutsTyp(UUID.randomUUID()) // TODO: Set to correct value when available
-            .beslutsTyp(UUID.randomUUID()) // TODO: Set to correct value when available
-            .beslutsUtfall(UUID.randomUUID()) // TODO: Set to correct value when available
+            .avslutsTyp(beslutsdata.avslutstyp())
+            .beslutsTyp(beslutsdata.beslutstyp())
+            .beslutsUtfall(beslutsdata.beslutsutfall())
             .produceradeResultatRef(beslutsref)
+            .build();
+
+      var beslutsfattare = ImmutableIdtyp.builder() // TODO: Replace with id for handlaggare when available
+            .typId(UUID.randomUUID().toString())
+            .varde(UUID.randomUUID().toString())
             .build();
 
       return ImmutableBeslut.builder()
             .id(UUID.randomUUID())
             .version(1)
             .datum(OffsetDateTime.now())
-            .beslutsfattare(UUID.randomUUID()) // TODO: Set to id for handlaggare when available
+            .beslutsfattare(beslutsfattare)
             .beslutsrader(List.of(beslutsrad))
             .build();
-   }
-
-   private Yrkandestatus mapYrkandestatus(se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Yrkandestatus ersattningstatus)
-   {
-      return switch (ersattningstatus) {
-         case PLANERAT -> Yrkandestatus.PLANERAT;
-         case YRKAT -> Yrkandestatus.YRKAT;
-         case FASTSTALLT -> Yrkandestatus.FASTSTALLT;
-         case UNDER_UTREDNING -> Yrkandestatus.UNDER_UTREDNING;
-         case FASTSTALLT_UNDER_UTREDNING -> Yrkandestatus.FASTSTALLT_UNDER_UTREDNING;
-         default -> throw new IllegalStateException("Unexpected value: " + ersattningstatus);
-      };
    }
 
    private Optional<Yrkande.IndividYrkandeRoll> findYrkandeIndivid(List<Yrkande.IndividYrkandeRoll> individer)
    {
       for (var individYrkandeRoll : individer)
       {
-         var roll = yrkanderollAdapter.getYrkanderoll(individYrkandeRoll.yrkandeRollId());
+         var roll = referensdataAdapter.getYrkanderoll(individYrkandeRoll.yrkandeRollId());
 
          if (roll != null && roll.namn().equalsIgnoreCase("sökande"))
          {
@@ -202,6 +223,11 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       }
 
       return Optional.empty();
+   }
+
+   private Optional<Referensdata> findFaststalltYrkandeStatus()
+   {
+      return referensdataAdapter.getYrkandestatusar().stream().filter(r -> r.kod().equalsIgnoreCase("faststallt")).findFirst();
    }
 
    private Optional<Ersattning> getErsattning(ProduceratResultat produceratResultat)
@@ -214,5 +240,28 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       {
          return Optional.empty();
       }
+   }
+
+   private se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Referensdata toApiReferensdata(
+         Referensdata referensdata)
+   {
+      se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Referensdata apiReferensdata = new se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Referensdata();
+      apiReferensdata.setId(referensdata.id());
+      apiReferensdata.setKod(referensdata.kod());
+      apiReferensdata.setNamn(referensdata.namn());
+
+      return apiReferensdata;
+   }
+
+   private ProduceratResultat createUpdatedProduceratResultat(Handlaggning handlaggning, UpdateErsattning ersattningUpdate)
+   {
+      var ersattningResult = handlaggning.yrkande().produceradeResultat().stream()
+            .filter(pr -> pr.id().equals(ersattningUpdate.getErsattningId())).findFirst().orElseThrow();
+
+      return ImmutableProduceratResultat.builder()
+            .from(ersattningResult)
+            .version(ersattningResult.version() + 1)
+            .yrkandeStatus(ersattningUpdate.getYrkandestatus())
+            .build();
    }
 }

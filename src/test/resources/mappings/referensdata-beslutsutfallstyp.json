@@ -1,0 +1,29 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/beslutsutfallstyp"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "id": "f011934d-d05e-404d-95ab-24571eec241b",
+        "kod": "BEVILJAT",
+        "namn": "Beviljat"
+      },
+      {
+        "id": "1429cc69-1e9d-49be-be41-8e5e4e05a0f9",
+        "kod": "AVSLAG",
+        "namn": "Avslag"
+      },
+      {
+        "id": "5922e22f-4872-4757-938c-5925ef650742",
+        "kod": "ANDRING",
+        "namn": "Ändring"
+      }
+    ]
+  }
+}
