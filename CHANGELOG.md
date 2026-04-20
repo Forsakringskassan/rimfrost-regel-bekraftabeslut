@@ -2,6 +2,13 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 0.0.10 (2026-04-17)
+
+### Bug Fixes
+
+-  Use ErsattningData from rimfrost-ersattning-data ([db4c2](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/db4c207364c59ac) Lars Persson)  
+-  Use referensdata adapter ([a0caf](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/a0cafb3c7c1d3c2) Lars Persson)  
+
 ## 0.0.9 (2026-04-08)
 
 ### Bug Fixes
