@@ -28,7 +28,6 @@ import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.logic.RegelUtils;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceBase;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceInterface;
-import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Beslutsutfall;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.UpdateErsattning;
