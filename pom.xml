@@ -76,12 +76,12 @@
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>0.2.11</version>
+      <version>0.2.13</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell-test-base</artifactId>
-      <version>0.2.11</version>
+      <version>0.2.13</version>
       <scope>test</scope>
     </dependency>
     <dependency>
