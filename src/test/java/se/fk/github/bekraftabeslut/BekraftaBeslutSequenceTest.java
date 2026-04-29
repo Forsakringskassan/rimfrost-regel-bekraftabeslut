@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import se.fk.rimfrost.Status;
 import se.fk.rimfrost.framework.oul.logic.dto.ImmutableIdtyp;
 import se.fk.rimfrost.framework.regel.Utfall;
-import se.fk.rimfrost.framework.regel.manuell.RegelManuellTestBase;
+import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendGetAvslutstypBekraftaBeslut;
@@ -18,14 +18,14 @@ import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendGetBeslutsu
 import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendPatchBekraftaBeslut;
 import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendPostBekraftaBeslut;
 import static se.fk.github.bekraftabeslut.BekraftaBeslutTestData.newPatchDataRequest;
-import static se.fk.rimfrost.framework.regel.test.WireMockHandlaggning.waitForHandlaggningRequests;
+import static se.fk.rimfrost.framework.regel.WireMockHandlaggning.waitForHandlaggningRequests;
 
 @QuarkusTest
 @QuarkusTestResource.List(
 {
       @QuarkusTestResource(WireMockBekraftaBeslut.class)
 })
-public class BekraftaBeslutSequenceTest extends RegelManuellTestBase
+public class BekraftaBeslutSequenceTest extends AbstractRegelManuellTest
 {
 
    @ParameterizedTest

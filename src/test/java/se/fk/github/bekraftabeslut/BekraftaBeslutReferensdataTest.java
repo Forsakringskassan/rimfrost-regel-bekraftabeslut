@@ -3,7 +3,7 @@ package se.fk.github.bekraftabeslut;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
-import se.fk.rimfrost.framework.regel.manuell.RegelManuellTestBase;
+import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.Referensdata;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendGetBeslutsu
 {
       @QuarkusTestResource(WireMockBekraftaBeslut.class)
 })
-class BekraftaBeslutReferensdataTest extends RegelManuellTestBase
+class BekraftaBeslutReferensdataTest extends AbstractRegelManuellTest
 {
    @Test
    void get_avslutstyp_should_return_expected_ids()
