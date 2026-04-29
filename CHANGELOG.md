@@ -2,6 +2,31 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 1.0.0 (2026-04-29)
+
+### Breaking changes
+
+-  release 1.0 ([8c6de](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/8c6def6da5819bb) Lars Persson)  
+
+### Features
+
+-  release 1.0 ([8c6de](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/8c6def6da5819bb) Lars Persson)  
+
+### Bug Fixes
+
+-  Bump apis to released versions ([43b67](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/43b670b25d0ca10) Lars Persson)  
+-  bump framework-regel-manuell version ([7b2de](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/7b2de709f33066d) Nils Elveros)  
+-  Split test into multiple to align with rtf-manuell test structure ([1cf26](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/1cf260325cb01de) Lars Persson)  
+-  Bump rimfrost-framework-regel-manuell version ([c6d4f](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/c6d4f1cf86014f1) Lars Persson)  
+
+### Other changes
+
+**removed kafka.subtopic from test properties**
+
+
+[8ea53](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/8ea53d1c78311db) Nils Elveros *2026-04-23 09:14:31*
+
+
 ## 0.0.10 (2026-04-17)
 
 ### Bug Fixes
