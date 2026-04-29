@@ -2,13 +2,13 @@ package se.fk.github.bekraftabeslut;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
-import se.fk.rimfrost.framework.regel.manuell.RegelManuellTestBase;
+import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
-public class BekraftaBeslutHealthTest extends RegelManuellTestBase
+public class BekraftaBeslutHealthTest extends AbstractRegelManuellTest
 {
    @Test
    void health_status_should_be_up()

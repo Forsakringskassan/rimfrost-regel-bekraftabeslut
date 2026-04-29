@@ -1,7 +1,7 @@
 package se.fk.github.bekraftabeslut;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import se.fk.rimfrost.framework.regel.manuell.WireMockRegelManuell;
+import se.fk.rimfrost.framework.regel.manuell.helpers.WireMockRegelManuell;
 import java.util.HashMap;
 import java.util.Map;
 

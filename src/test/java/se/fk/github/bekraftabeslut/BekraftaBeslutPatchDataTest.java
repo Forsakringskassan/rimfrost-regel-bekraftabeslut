@@ -5,7 +5,8 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import se.fk.rimfrost.framework.regel.manuell.RegelManuellTestBase;
+import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendPatchBekraftaBeslut;
@@ -17,7 +18,7 @@ import static se.fk.github.bekraftabeslut.BekraftaBeslutTestData.newPatchDataReq
 {
       @QuarkusTestResource(WireMockBekraftaBeslut.class)
 })
-public class BekraftaBeslutPatchDataTest extends RegelManuellTestBase
+public class BekraftaBeslutPatchDataTest extends AbstractRegelManuellTest
 {
 
    @ParameterizedTest

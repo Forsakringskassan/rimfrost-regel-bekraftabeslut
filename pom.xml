@@ -71,43 +71,62 @@
     <dependency>
       <groupId>se.fk.rimfrost.regel.bekraftabeslut.openapi</groupId>
       <artifactId>rimfrost-regel-bekraftabeslut-openapi-jaxrs-spec</artifactId>
-      <version>0.0.6</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>0.2.13</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
-      <artifactId>rimfrost-framework-regel-manuell-test-base</artifactId>
-      <version>0.2.13</version>
+      <artifactId>rimfrost-framework-regel-manuell</artifactId>
+      <version>1.0.0</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.framework.regel</groupId>
+      <artifactId>rimfrost-framework-regel</artifactId>
+      <version>1.0.0</version>
+      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.arbetsgivare</groupId>
       <artifactId>rimfrost-adapter-arbetsgivare</artifactId>
-      <version>0.1.1</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.folkbokford</groupId>
       <artifactId>rimfrost-adapter-folkbokford</artifactId>
-      <version>0.0.3</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.referensdata</groupId>
       <artifactId>rimfrost-adapter-referensdata</artifactId>
-      <version>0.0.1</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.uppgiftstatusprovider</groupId>
       <artifactId>rimfrost-framework-uppgift-status-provider</artifactId>
-      <version>0.0.3</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.ersattningdata</groupId>
       <artifactId>rimfrost-ersattning-data</artifactId>
-      <version>0.0.1</version>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-junit5-mockito</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>4.3.0</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

@@ -7,8 +7,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import se.fk.rimfrost.Status;
-import se.fk.rimfrost.framework.handlaggning.model.HandlaggningUpdate;
-import se.fk.rimfrost.framework.regel.manuell.RegelManuellTestBase;
+import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutHandlaggningRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +18,7 @@ import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendPostBekraft
 {
       @QuarkusTestResource(WireMockBekraftaBeslut.class)
 })
-public class BekraftaBeslutPostDataTest extends RegelManuellTestBase
+public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
 {
 
    @ParameterizedTest
