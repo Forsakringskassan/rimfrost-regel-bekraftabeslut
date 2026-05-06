@@ -76,36 +76,36 @@
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel</groupId>
       <artifactId>rimfrost-framework-regel</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.2</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.arbetsgivare</groupId>
       <artifactId>rimfrost-adapter-arbetsgivare</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.folkbokford</groupId>
       <artifactId>rimfrost-adapter-folkbokford</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.referensdata</groupId>
       <artifactId>rimfrost-adapter-referensdata</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.2</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.uppgiftstatusprovider</groupId>
