@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,7 +75,17 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    @Override
    public GetDataResponse readData(Handlaggning handlaggning)
    {
-      var yrkandeIndivid = findYrkandeIndivid(handlaggning.yrkande().individYrkandeRoller()).orElseThrow();
+      Yrkande.IndividYrkandeRoll yrkandeIndivid;
+      try
+      {
+         yrkandeIndivid = findYrkandeIndivid(handlaggning.yrkande().individYrkandeRoller()).orElseThrow();
+      }
+      catch (NoSuchElementException e)
+      {
+         logger.error("Failed to find yrkande individ in handlaggning information. Handlaggning id: {}", handlaggning.id(), e);
+         throw new RegelManuellException(Response.Status.INTERNAL_SERVER_ERROR,
+               "Failed to find yrkande individ in handlaggning information");
+      }
 
       var individ = yrkandeIndivid.individ();
 
@@ -120,7 +131,17 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    {
       Handlaggning handlaggning = getHandlaggning(handlaggningId);
 
-      Referensdata faststalltYrkandeStatus = findFaststalltYrkandeStatus().orElseThrow();
+      Referensdata faststalltYrkandeStatus;
+      try
+      {
+         faststalltYrkandeStatus = findFaststalltYrkandestatus().orElseThrow();
+      }
+      catch (NoSuchElementException e)
+      {
+         logger.error("Failed to find faststallt yrkandestatus in referensdata. Handlaggning id: {}", handlaggningId, e);
+         throw new RegelManuellException(Response.Status.INTERNAL_SERVER_ERROR,
+               "Failed to find faststallt yrkandestatus in referensdata");
+      }
 
       var updatedYrkande = ImmutableYrkande.builder()
             .from(handlaggning.yrkande())
@@ -274,7 +295,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       return Optional.empty();
    }
 
-   private Optional<Referensdata> findFaststalltYrkandeStatus()
+   private Optional<Referensdata> findFaststalltYrkandestatus()
    {
       try
       {
@@ -301,8 +322,18 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
 
    private ProduceratResultat createUpdatedProduceratResultat(Handlaggning handlaggning, UpdateErsattning ersattningUpdate)
    {
-      var ersattningResult = handlaggning.yrkande().produceradeResultat().stream()
-            .filter(pr -> pr.id().equals(ersattningUpdate.getErsattningId())).findFirst().orElseThrow();
+      ProduceratResultat ersattningResult;
+      try
+      {
+         ersattningResult = handlaggning.yrkande().produceradeResultat().stream()
+               .filter(pr -> pr.id().equals(ersattningUpdate.getErsattningId())).findFirst().orElseThrow();
+      }
+      catch (NoSuchElementException e)
+      {
+         logger.error("Failed to locate ProduceratResultat with id {}", ersattningUpdate.getErsattningId(), e);
+         throw new RegelManuellException(Response.Status.BAD_REQUEST,
+               "Failed to locate ersattning with id " + ersattningUpdate.getErsattningId());
+      }
 
       return ImmutableProduceratResultat.builder()
             .from(ersattningResult)

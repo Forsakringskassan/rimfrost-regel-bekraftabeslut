@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import se.fk.github.bekraftabeslut.logic.BekraftaBeslutService;
@@ -40,9 +41,11 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static se.fk.github.bekraftabeslut.BekraftaBeslutTestData.newPatchDataRequest;
 
 @QuarkusTest
 @QuarkusTestResource.List(
@@ -268,6 +271,53 @@ public class BekraftaBeslutExceptionTest
             () -> bekraftaBeslutService.getBeslutsutfallstyp());
 
       assertEquals(expectedStatus(errorCode), exception.getStatus());
+   }
+
+   @Test
+   void ersattning_not_found_exception_maps_to_regel_manuell_exception()
+   {
+      var commonData = mock(ManuellRegelCommonData.class);
+      when(commonData.uppgift()).thenReturn(mock(Uppgift.class));
+      when(bekraftaBeslutDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
+
+      var exception = assertThrows(RegelManuellException.class,
+            () -> bekraftaBeslutService.updateData(createHandlaggning(), newPatchDataRequest()));
+
+      assertEquals(Response.Status.BAD_REQUEST, exception.getStatus());
+   }
+
+   @ParameterizedTest
+   @CsvSource(
+   {
+         "(?i)^Failed to find yrkande individ in handlaggning information.*"
+   })
+   void yrkande_individ_not_found_exception_maps_to_regel_manuell_exception(String expectedMsgRegex) throws ReferensdataException
+   {
+      when(referensdataAdapter.getYrkanderoller()).thenReturn(List.of());
+
+      var exception = assertThrows(RegelManuellException.class,
+            () -> bekraftaBeslutService.readData(handlaggningMock()));
+
+      assertEquals(Response.Status.INTERNAL_SERVER_ERROR, exception.getStatus());
+      assertTrue(exception.getMessage().matches(expectedMsgRegex));
+   }
+
+   @ParameterizedTest
+   @CsvSource(
+   {
+         "f674a6ab-ffcd-4a28-a748-dce0e1b2e20d, (?i)^Failed to find faststallt yrkandestatus in referensdata.*"
+   })
+   void faststallt_yrkandestatus_not_found_exception_maps_to_regel_manuell_exception(UUID handlaggningId, String expectedMsgRegex)
+         throws ReferensdataException, HandlaggningException
+   {
+      when(handlaggningAdapter.readHandlaggning(handlaggningId)).thenReturn(mock(Handlaggning.class));
+      when(referensdataAdapter.getYrkandestatusar()).thenReturn(List.of());
+
+      var exception = assertThrows(RegelManuellException.class,
+            () -> bekraftaBeslutService.done(handlaggningId));
+
+      assertEquals(Response.Status.INTERNAL_SERVER_ERROR, exception.getStatus());
+      assertTrue(exception.getMessage().matches(expectedMsgRegex));
    }
 
    private static Response.Status expectedStatus(FolkbokfordException.ErrorType errorType)
