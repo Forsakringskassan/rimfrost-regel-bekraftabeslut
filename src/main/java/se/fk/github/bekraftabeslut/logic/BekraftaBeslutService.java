@@ -121,7 +121,6 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       Handlaggning handlaggning = getHandlaggning(handlaggningId);
 
       Referensdata faststalltYrkandeStatus = findFaststalltYrkandeStatus().orElseThrow();
-      ;
 
       var updatedYrkande = ImmutableYrkande.builder()
             .from(handlaggning.yrkande())
