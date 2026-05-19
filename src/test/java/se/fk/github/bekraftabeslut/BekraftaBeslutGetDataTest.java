@@ -26,6 +26,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    void get_data_should_contain_handlaggning_id(String handlaggningId)
    {
       regelKafkaConnector.sendRegelRequest(handlaggningId);
+      waitForRegelManuellReady(handlaggningId);
       var getDataResponse = sendGetBekraftaBeslut(handlaggningId);
       Assertions.assertEquals(handlaggningId, getDataResponse.getHandlaggningId().toString());
    }
@@ -38,6 +39,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    void get_data_should_contain_ersattningar(String handlaggningId)
    {
       regelKafkaConnector.sendRegelRequest(handlaggningId);
+      waitForRegelManuellReady(handlaggningId);
       var getDataResponse = sendGetBekraftaBeslut(handlaggningId);
       Assertions.assertEquals(1, getDataResponse.getErsattning().size());
       Assertions.assertEquals(BekraftaBeslutTestData.ERSATTNINGSID,
@@ -54,6 +56,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    void get_data_should_contain_kund(String handlaggningId)
    {
       regelKafkaConnector.sendRegelRequest(handlaggningId);
+      waitForRegelManuellReady(handlaggningId);
       var getDataResponse = sendGetBekraftaBeslut(handlaggningId);
       Assertions.assertEquals(BekraftaBeslutTestData.KUND_FORNAMN, getDataResponse.getKund().getFornamn());
       Assertions.assertEquals(BekraftaBeslutTestData.KUND_EFTERNAMN, getDataResponse.getKund().getEfternamn());
@@ -67,6 +70,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    void get_data_should_update_handlaggning(String handlaggningId) throws JsonProcessingException
    {
       regelKafkaConnector.sendRegelRequest(handlaggningId);
+      waitForRegelManuellReady(handlaggningId);
       //
       // clear wiremock requests
       //
