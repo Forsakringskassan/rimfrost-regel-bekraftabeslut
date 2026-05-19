@@ -2,6 +2,22 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 1.1.0 (2026-05-19)
+
+### Features
+
+-  Remove redundant index-dependency entries covered by rimfrost-framework-regel-manuell ([6d75f](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/6d75ff23f7bbbb0) Ulf Slunga)  
+-  Add waitForRegelManuellReady to GET and PATCH tests to avoid race conditions ([b5c90](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/b5c9021e40a43db) Ulf Slunga)  
+
+### Bug Fixes
+
+-  Migrate storage to framework ManuellRegelCommonDataStorage with PostgreSQL persistence ([fc59c](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/fc59c2171d24b1f) Ulf Slunga)  
+-  Bump rimfrost-framework-regel-manuell version ([fe6cc](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/fe6cc1cc2eafa95) Lars Persson)  
+-  Add try-catch handling with logging at places where an exception may be thrown ([1cbcc](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/1cbcc76f3b4e63f) Lars Persson)  
+-  Remove superfluous semicolon ([e0002](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/e0002cb20413c3c) Lars Persson)  
+-  Bump rimfrost-framework-regel-manuell version ([73ea3](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/73ea3d45b87c565) Lars Persson)  
+-  Handle exceptions from external dependencies ([96ad2](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/96ad2845dd2cb20) Lars Persson)  
+
 ## 1.0.0 (2026-04-29)
 
 ### Breaking changes
