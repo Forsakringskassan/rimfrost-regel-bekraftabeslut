@@ -29,6 +29,7 @@ public class BekraftaBeslutPatchDataTest extends AbstractRegelManuellTest
    void patch_data_should_update_handlaggning(String handlaggningId) throws JsonProcessingException
    {
       regelKafkaConnector.sendRegelRequest(handlaggningId);
+      waitForRegelManuellReady(handlaggningId);
       //
       // clear wiremock requests
       //
