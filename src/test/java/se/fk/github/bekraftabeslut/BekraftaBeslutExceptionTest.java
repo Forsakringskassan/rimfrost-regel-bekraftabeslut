@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import se.fk.github.bekraftabeslut.logic.BekraftaBeslutService;
-import se.fk.github.bekraftabeslut.storage.BekraftaBeslutDataStorage;
+import se.fk.rimfrost.framework.regel.manuell.storage.ManuellRegelCommonDataStorage;
 import se.fk.rimfrost.adapter.arbetsgivare.ArbetsgivareAdapter;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.rimfrost.adapter.arbetsgivare.exception.ArbetsgivareErrorCode;
@@ -69,7 +69,7 @@ public class BekraftaBeslutExceptionTest
    HandlaggningAdapter handlaggningAdapter;
 
    @InjectMock
-   BekraftaBeslutDataStorage bekraftaBeslutDataStorage;
+   ManuellRegelCommonDataStorage manuellRegelCommonDataStorage;
 
    @Inject
    BekraftaBeslutService bekraftaBeslutService;
@@ -186,7 +186,7 @@ public class BekraftaBeslutExceptionTest
 
       when(handlaggningAdapter.readHandlaggning(Mockito.any())).thenReturn(updatedHandlaggning);
       when(referensdataAdapter.getYrkandestatusar()).thenReturn(createYrkandestatusar());
-      when(bekraftaBeslutDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
+      when(manuellRegelCommonDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
 
       var exception = assertThrows(RegelManuellException.class,
             () -> bekraftaBeslutService.done(UUID.randomUUID()));
@@ -205,7 +205,7 @@ public class BekraftaBeslutExceptionTest
       when(handlaggningAdapter.readHandlaggning(Mockito.any())).thenReturn(createHandlaggning());
       when(handlaggningAdapter.updateHandlaggning(Mockito.any())).thenThrow(new HandlaggningException(errorType, "test"));
       when(referensdataAdapter.getYrkandestatusar()).thenReturn(createYrkandestatusar());
-      when(bekraftaBeslutDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
+      when(manuellRegelCommonDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
 
       var exception = assertThrows(RegelManuellException.class,
             () -> bekraftaBeslutService.done(UUID.randomUUID()));
@@ -278,7 +278,7 @@ public class BekraftaBeslutExceptionTest
    {
       var commonData = mock(ManuellRegelCommonData.class);
       when(commonData.uppgift()).thenReturn(mock(Uppgift.class));
-      when(bekraftaBeslutDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
+      when(manuellRegelCommonDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
 
       var exception = assertThrows(RegelManuellException.class,
             () -> bekraftaBeslutService.updateData(createHandlaggning(), newPatchDataRequest()));

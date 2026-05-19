@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.fk.github.bekraftabeslut.logic.entity.Beslutsdata;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableBeslutsdata;
-import se.fk.github.bekraftabeslut.storage.BekraftaBeslutDataStorage;
+import se.fk.rimfrost.framework.regel.manuell.storage.ManuellRegelCommonDataStorage;
 import se.fk.rimfrost.adapter.arbetsgivare.ArbetsgivareAdapter;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ImmutableArbetsgivareRequest;
@@ -70,7 +70,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    ReferensdataAdapter referensdataAdapter;
 
    @Inject
-   BekraftaBeslutDataStorage dataStorage;
+   ManuellRegelCommonDataStorage dataStorage;
 
    @Override
    public GetDataResponse readData(Handlaggning handlaggning)
