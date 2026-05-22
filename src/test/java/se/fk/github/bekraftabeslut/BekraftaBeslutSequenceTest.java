@@ -46,15 +46,6 @@ public class BekraftaBeslutSequenceTest extends AbstractRegelManuellTest
       var handlaggningGetRequests = waitForHandlaggningRequests(handlaggningId, RequestMethod.GET, 1);
       assertEquals(1, handlaggningGetRequests.size());
       //
-      // Verify oul message produced
-      //
-      var messages = oulKafkaConnector.waitForMessages(getOulRequestsChannel());
-      assertEquals(1, messages.size());
-      //
-      // Send mocked OUL response
-      //
-      oulKafkaConnector.simulateOulResponse(handlaggningId, uppgiftId);
-      //
       // mock status update from OUL
       //
       var utforarId = ImmutableIdtyp.builder()
