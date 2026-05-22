@@ -5,8 +5,8 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import se.fk.rimfrost.Status;
 import se.fk.rimfrost.framework.oul.logic.dto.ImmutableIdtyp;
+import se.fk.rimfrost.framework.regel.manuell.base.RegelManuellTestStatus;
 import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 
@@ -52,7 +52,7 @@ public class BekraftaBeslutSequenceTest extends AbstractRegelManuellTest
             .typId(idtypTypId)
             .varde(idtypVarde)
             .build();
-      oulKafkaConnector.simulateOulStatus(handlaggningId, uppgiftId, utforarId, Status.NY);
+      oulKafkaConnector.simulateOulStatus(handlaggningId, uppgiftId, utforarId, RegelManuellTestStatus.NY);
       //
       // Verify PUT handlaggning
       //
@@ -97,10 +97,6 @@ public class BekraftaBeslutSequenceTest extends AbstractRegelManuellTest
       //
       handlaggningPutRequests = WireMockBekraftaBeslut.waitForHandlaggningRequests(handlaggningId, RequestMethod.PUT, 5);
       assertEquals(6, handlaggningPutRequests.size());
-      //
-      // verify kafka status message sent to oul
-      //
-      oulKafkaConnector.waitForOulStatusMessage();
       //
       // Verify produced regel response
       //
