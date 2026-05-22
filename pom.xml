@@ -76,12 +76,17 @@
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>1.0.7</version>
+      <version>1.0.8</version>
+    </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.framework.oul</groupId>
+      <artifactId>rimfrost-framework-oul-adapter</artifactId>
+      <version>0.0.2</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>1.0.7</version>
+      <version>1.0.8</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
