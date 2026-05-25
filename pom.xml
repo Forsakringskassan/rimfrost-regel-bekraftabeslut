@@ -51,7 +51,6 @@
       <artifactId>smallrye-reactive-messaging-in-memory</artifactId>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.wiremock</groupId>
       <artifactId>wiremock</artifactId>
@@ -74,14 +73,14 @@
       <version>1.0.0</version>
     </dependency>
     <dependency>
-      <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
-      <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>1.0.11</version>
-    </dependency>
-    <dependency>
       <groupId>se.fk.rimfrost.framework.oul</groupId>
       <artifactId>rimfrost-framework-oul-adapter</artifactId>
       <version>0.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
+      <artifactId>rimfrost-framework-regel-manuell</artifactId>
+      <version>1.0.11</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
