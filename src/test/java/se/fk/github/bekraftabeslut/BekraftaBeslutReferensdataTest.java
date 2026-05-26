@@ -8,7 +8,7 @@ import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generat
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendGetAvslutstypBekraftaBeslut;
 import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendGetBeslutstypBekraftaBeslut;
 import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendGetBeslutsutfallstypBekraftaBeslut;
