@@ -1,0 +1,19 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/uppgifter"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "uppgift_id": "11e53b18-e9ac-4707-825b-a1cb80689c29",
+      "handlaggning_id": "5367f6b8-cc4a-11f0-8de9-199901011234",
+      "cloudevent_attributes": {},
+      "status": "NY"
+    }
+  }
+}
