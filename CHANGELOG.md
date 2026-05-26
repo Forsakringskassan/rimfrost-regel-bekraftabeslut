@@ -2,6 +2,19 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 1.1.1 (2026-05-26)
+
+### Bug Fixes
+
+-  replace JUnit 4 Assert import with JUnit 5 Assertions ([ddf88](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/ddf88cc6288ff90) Ulf Slunga)  
+-  fix pom.xml dependency indentation and ordering ([f4976](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/f49761a5109e777) Ulf Slunga)  
+-  remove redundant test properties already defined in src/main ([39608](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/396083fd0bdab63) Ulf Slunga)  
+-  bump regel-manuell to 1.0.11, add erbjudande wiring and OUL REST stubs ([9b6fd](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/9b6fdeab3f8c1b0) Ulf Slunga)  
+-  update tests for OUL REST — replace Status and waitForOulStatusMessage ([de216](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/de2168a8cdbcf9f) Ulf Slunga)  
+-  bump rimfrost-framework-regel-manuell to 1.0.9 ([573d4](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/573d4a6723a2cfc) Ulf Slunga)  
+-  remove obsolete Kafka OUL request/response steps from SequenceTest ([8f5e4](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/8f5e4bebcfc04a4) Ulf Slunga)  
+-  switch OUL interface from Kafka to REST ([86700](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/86700b86c488dac) Ulf Slunga)  
+
 ## 1.1.0 (2026-05-19)
 
 ### Features
