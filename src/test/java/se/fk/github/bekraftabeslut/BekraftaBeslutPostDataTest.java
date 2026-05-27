@@ -6,6 +6,7 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutHandlaggningRequest;
 
@@ -66,6 +67,23 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
       //
       var endRequests = WireMockBekraftaBeslut.waitForRequest("/uppgifter/" + uppgiftId + "/end", RequestMethod.POST, 1);
       assertEquals(1, endRequests.size());
+   }
+
+   @ParameterizedTest
+   @CsvSource(
+   {
+         "5367f6b8-cc4a-11f0-8de9-199901015555"
+   })
+   void post_data_done_should_produce_godkand_when_ersattning_beslutsutfall_is_fu_but_beslut_is_beviljat(String handlaggningId)
+   {
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
+      waitForRegelManuellReady(handlaggningId);
+
+      sendPostBekraftaBeslut(handlaggningId);
+
+      var regelResponse = regelKafkaConnector.waitForRegelResponse();
+      assertEquals(handlaggningId, regelResponse.getData().getHandlaggningId());
+      assertEquals(Utfall.JA, regelResponse.getData().getUtfall());
    }
 
    @ParameterizedTest
