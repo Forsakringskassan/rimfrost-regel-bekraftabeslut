@@ -1,7 +1,6 @@
 package se.fk.github.bekraftabeslut.logic;
 
 import io.quarkus.runtime.Startup;
-import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -70,18 +69,6 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
 
    @Inject
    ManuellRegelCommonDataStorage dataStorage;
-
-   private String beviljatBeslutsutfallId;
-
-   @PostConstruct
-   void init()
-   {
-      beviljatBeslutsutfallId = findBeviljatBeslutsutfallId().orElse(null);
-      if (beviljatBeslutsutfallId == null)
-      {
-         logger.warn("Referensdata does not contain a beslutsutfall with kod 'beviljat' — done() will always produce Utfall.NEJ");
-      }
-   }
 
    @Override
    public GetDataResponse readData(Handlaggning handlaggning)
@@ -164,10 +151,12 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .yrkande(updatedYrkande)
             .build();
 
+      var beviljatId = findBeviljatBeslutsutfallId().orElse(null);
+
       var beslut = handlaggning.yrkande().beslut();
-      var utfall = beviljatBeslutsutfallId != null
+      var utfall = beviljatId != null
             && beslut != null
-            && beslut.beslutsrader().stream().anyMatch(r -> beviljatBeslutsutfallId.equals(r.beslutsUtfall()))
+            && beslut.beslutsrader().stream().anyMatch(r -> beviljatId.equals(r.beslutsUtfall()))
                   ? Utfall.JA
                   : Utfall.NEJ;
 
