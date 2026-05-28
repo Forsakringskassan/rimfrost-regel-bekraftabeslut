@@ -89,6 +89,40 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
    @ParameterizedTest
    @CsvSource(
    {
+         "5367f6b8-cc4a-11f0-8de9-199901016666"
+   })
+   void post_data_done_should_produce_nej_when_beslut_is_absent(String handlaggningId)
+   {
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
+      waitForRegelManuellReady(handlaggningId);
+
+      sendPostBekraftaBeslut(handlaggningId);
+
+      var regelResponse = regelKafkaConnector.waitForRegelResponse();
+      assertEquals(handlaggningId, regelResponse.getData().getHandlaggningId());
+      assertEquals(Utfall.NEJ, regelResponse.getData().getUtfall());
+   }
+
+   @ParameterizedTest
+   @CsvSource(
+   {
+         "5367f6b8-cc4a-11f0-8de9-199901017777"
+   })
+   void post_data_done_should_produce_nej_when_beslut_has_non_beviljat_utfall(String handlaggningId)
+   {
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
+      waitForRegelManuellReady(handlaggningId);
+
+      sendPostBekraftaBeslut(handlaggningId);
+
+      var regelResponse = regelKafkaConnector.waitForRegelResponse();
+      assertEquals(handlaggningId, regelResponse.getData().getHandlaggningId());
+      assertEquals(Utfall.NEJ, regelResponse.getData().getUtfall());
+   }
+
+   @ParameterizedTest
+   @CsvSource(
+   {
          "5367f6b8-cc4a-11f0-8de9-199901011234, 11e53b18-e9ac-4707-825b-a1cb80689c29, 16bd3d95-8fad-4f9c-a87a-ba146db55c9b"
    })
    void post_data_done_should_update_yrkande_faststalld(String handlaggningId, String uppgiftId, String yrkandestatus)
