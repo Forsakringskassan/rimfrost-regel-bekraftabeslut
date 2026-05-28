@@ -5,7 +5,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -34,7 +33,6 @@ import se.fk.rimfrost.adapter.referensdata.adapter.ReferensdataAdapter;
 import se.fk.rimfrost.adapter.referensdata.adapter.ReferensdataErrorCode;
 import se.fk.rimfrost.adapter.referensdata.adapter.ReferensdataException;
 import se.fk.rimfrost.adapter.referensdata.model.Referensdata;
-import se.fk.rimfrost.ersattningdata.ErsattningData;
 import se.fk.rimfrost.framework.handlaggning.adapter.HandlaggningAdapter;
 import se.fk.rimfrost.framework.handlaggning.exception.HandlaggningException;
 import se.fk.rimfrost.framework.handlaggning.model.*;
@@ -153,18 +151,14 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .yrkande(updatedYrkande)
             .build();
 
-      var ersattningResultats = handlaggning.yrkande().produceradeResultat().stream()
-            .filter(pr -> pr.typ().equalsIgnoreCase("ersattning")).toList();
+      var beviljatId = findBeviljatBeslutsutfallId().orElse(null);
 
-      List<ErsattningData> ersattningar = new ArrayList<>();
-      for (var ersattningResultat : ersattningResultats)
-      {
-         ersattningar.add(getErsattningData(ersattningResultat.data()));
-      }
-
-      var utfall = ersattningar.stream().allMatch(e -> e.getBeslutsutfall() == se.fk.rimfrost.ersattningdata.Beslutsutfall.JA)
-            ? Utfall.JA
-            : Utfall.NEJ;
+      var beslut = handlaggning.yrkande().beslut();
+      var utfall = beviljatId != null
+            && beslut != null
+            && beslut.beslutsrader().stream().anyMatch(r -> beviljatId.equals(r.beslutsUtfall()))
+                  ? Utfall.JA
+                  : Utfall.NEJ;
 
       updateHandlaggning(handlaggningUpdate);
 
@@ -403,16 +397,21 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       }
    }
 
-   private ErsattningData getErsattningData(String json)
+   /** Returns the referensdata id for beslutsutfall with kod {@code beviljat}, or empty if not found. */
+   private Optional<String> findBeviljatBeslutsutfallId()
    {
       try
       {
-         return ErsattningData.fromJson(json, objectMapper);
+         return referensdataAdapter.getBeslutsutfallstyper().stream()
+               .filter(r -> r.kod().equalsIgnoreCase("beviljat"))
+               .findFirst()
+               .map(Referensdata::id);
       }
-      catch (RuntimeException e)
+      catch (ReferensdataException e)
       {
-         logger.error("Failed to parse json as ErsattningData", e);
-         throw new RegelManuellException(Response.Status.INTERNAL_SERVER_ERROR, "Failed to parse json as ErsattningData");
+         logger.error("Failed to read beslutsutfallstyp values while searching for beviljat. {}: {}",
+               e.getErrorCode(), e.getMessage());
+         throw mapToRegelManuellException(e.getErrorCode(), e.getMessage());
       }
    }
 
