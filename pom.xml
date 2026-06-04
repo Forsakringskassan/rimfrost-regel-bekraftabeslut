@@ -29,12 +29,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>kafka</artifactId>
-      <version>1.21.4</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>io.smallrye.reactive</groupId>
       <artifactId>smallrye-reactive-messaging-in-memory</artifactId>
       <scope>test</scope>
@@ -46,53 +40,48 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>se.fk.github.jaxrsclientfactory</groupId>
-      <artifactId>jaxrs-client-factory</artifactId>
-      <version>1.3.0</version>
-    </dependency>
-    <dependency>
       <groupId>se.fk.rimfrost.regel.bekraftabeslut.openapi</groupId>
       <artifactId>rimfrost-regel-bekraftabeslut-openapi-jaxrs-spec</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>1.0.11</version>
+      <version>1.0.15</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel.manuell</groupId>
       <artifactId>rimfrost-framework-regel-manuell</artifactId>
-      <version>1.0.11</version>
+      <version>1.0.15</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.framework.regel</groupId>
       <artifactId>rimfrost-framework-regel</artifactId>
-      <version>1.0.4</version>
+      <version>1.0.8</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.arbetsgivare</groupId>
       <artifactId>rimfrost-adapter-arbetsgivare</artifactId>
-      <version>1.0.1</version>
+      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.folkbokford</groupId>
       <artifactId>rimfrost-adapter-folkbokford</artifactId>
-      <version>1.0.1</version>
+      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.referensdata</groupId>
       <artifactId>rimfrost-referensdata-erbjudande</artifactId>
-      <version>0.0.2</version>
+      <version>0.0.3</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.adapter.referensdata</groupId>
       <artifactId>rimfrost-adapter-referensdata</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.3</version>
     </dependency>
     <dependency>
       <groupId>se.fk.rimfrost.ersattningdata</groupId>
