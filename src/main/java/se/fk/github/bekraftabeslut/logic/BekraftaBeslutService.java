@@ -75,7 +75,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    @Override
    public GetDataResponse readData(Handlaggning handlaggning)
    {
-      Yrkande.IndividYrkandeRoll yrkandeIndivid;
+      IndividYrkandeRoll yrkandeIndivid;
       try
       {
          yrkandeIndivid = findYrkandeIndivid(handlaggning.yrkande().individYrkandeRoller()).orElseThrow();
@@ -268,7 +268,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .build();
    }
 
-   private Optional<Yrkande.IndividYrkandeRoll> findYrkandeIndivid(List<Yrkande.IndividYrkandeRoll> individer)
+   private Optional<IndividYrkandeRoll> findYrkandeIndivid(List<IndividYrkandeRoll> individer)
    {
       Map<String, Referensdata> yrkandeRollerMap = null;
       try
