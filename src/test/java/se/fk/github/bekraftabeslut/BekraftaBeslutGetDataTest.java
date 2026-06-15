@@ -3,6 +3,7 @@ package se.fk.github.bekraftabeslut;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -18,6 +19,9 @@ import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendGetBekrafta
 })
 public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
 {
+   @ConfigProperty(name = "mp.messaging.outgoing.regel-responses.topic")
+   String responseTopic;
+
    @ParameterizedTest
    @CsvSource(
    {
@@ -25,7 +29,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    })
    void get_data_should_contain_handlaggning_id(String handlaggningId)
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId);
+      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
       waitForRegelManuellReady(handlaggningId);
       var getDataResponse = sendGetBekraftaBeslut(handlaggningId);
       Assertions.assertEquals(handlaggningId, getDataResponse.getHandlaggningId().toString());
@@ -38,7 +42,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    })
    void get_data_should_contain_ersattningar(String handlaggningId)
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId);
+      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
       waitForRegelManuellReady(handlaggningId);
       var getDataResponse = sendGetBekraftaBeslut(handlaggningId);
       Assertions.assertEquals(1, getDataResponse.getErsattning().size());
@@ -55,7 +59,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    })
    void get_data_should_contain_kund(String handlaggningId)
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId);
+      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
       waitForRegelManuellReady(handlaggningId);
       var getDataResponse = sendGetBekraftaBeslut(handlaggningId);
       Assertions.assertEquals(BekraftaBeslutTestData.KUND_FORNAMN, getDataResponse.getKund().getFornamn());
@@ -69,7 +73,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    })
    void get_data_should_update_handlaggning(String handlaggningId) throws JsonProcessingException
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId);
+      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
       waitForRegelManuellReady(handlaggningId);
       //
       // clear wiremock requests

@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import se.fk.github.bekraftabeslut.logic.BekraftaBeslutService;
+import se.fk.rimfrost.framework.handlaggning.model.IndividYrkandeRoll;
 import se.fk.rimfrost.framework.regel.manuell.storage.ManuellRegelCommonDataStorage;
 import se.fk.rimfrost.adapter.arbetsgivare.ArbetsgivareAdapter;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ArbetsgivareResponse;
@@ -366,7 +367,7 @@ public class BekraftaBeslutExceptionTest
 
    private static Handlaggning handlaggningMock()
    {
-      var individYrkandeRoll = mock(Yrkande.IndividYrkandeRoll.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+      var individYrkandeRoll = mock(IndividYrkandeRoll.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
       var handlaggning = mock(Handlaggning.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
       when(handlaggning.yrkande().individYrkandeRoller())
             .thenReturn(List.of(individYrkandeRoll));
