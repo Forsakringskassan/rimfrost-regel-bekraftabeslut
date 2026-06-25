@@ -8,3 +8,8 @@ jobs:
     secrets:
       PACKAGES_RW_ACTOR: ${{ secrets.PACKAGES_RW_ACTOR }}
       PACKAGES_RW_TOKEN: ${{ secrets.PACKAGES_RW_TOKEN }}
+
+  validate-config:
+    uses: Forsakringskassan/rimfrost-framework-regel/.github/workflows/validate-config.yaml@1.2.3
+    with:
+      framework-ref: '1.2.3'
