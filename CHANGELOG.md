@@ -2,6 +2,13 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 1.1.6 (2026-06-26)
+
+### Bug Fixes
+
+-  add config.yaml validation to CI and bump rimfrost-framework-regel to 1.2.3 ([fa885](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/fa885e1e80f835d) Ulf Slunga)  
+-  **deps**  update dependency se.fk.rimfrost.adapter.arbetsgivare:rimfrost-adapter-arbetsgivare to v1.1.3 ([5ed78](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/5ed78ba036114d8) renovate[bot])  
+
 ## 1.1.5 (2026-06-16)
 
 ### Bug Fixes
