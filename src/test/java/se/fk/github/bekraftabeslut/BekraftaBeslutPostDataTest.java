@@ -7,7 +7,9 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mockito;
 import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
+import se.fk.rimfrost.framework.regel.oul.logic.exception.OulServiceException;
 import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutHandlaggningRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,7 +58,7 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
    {
          "5367f6b8-cc4a-11f0-8de9-199901011234, 11e53b18-e9ac-4707-825b-a1cb80689c29"
    })
-   void post_data_done_should_update_oul_status(String handlaggningId, String uppgiftId)
+   void post_data_done_should_update_oul_status(String handlaggningId, String uppgiftId) throws OulServiceException
    {
       regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
       waitForRegelManuellReady(handlaggningId);
@@ -67,8 +69,7 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
       //
       // verify REST call to end uppgift was made
       //
-      var endRequests = WireMockBekraftaBeslut.waitForRequest("/uppgifter/" + uppgiftId + "/end", RequestMethod.POST, 1);
-      assertEquals(1, endRequests.size());
+      Mockito.verify(oulUppgiftService).endOulUppgift(Mockito.any(), Mockito.any());
    }
 
    @ParameterizedTest
@@ -98,6 +99,7 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
             PutHandlaggningRequest.class);
       assertEquals(handlaggningId, handlaggningPutUpdate.getHandlaggning().getId().toString());
       assertEquals(1, handlaggningPutUpdate.getHandlaggning().getVersion());
+      assertEquals(2, handlaggningPutUpdate.getHandlaggning().getYrkande().getVersion());
       assertEquals(yrkandestatus, handlaggningPutUpdate.getHandlaggning().getYrkande().getYrkandestatus());
    }
 

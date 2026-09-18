@@ -16,6 +16,7 @@ public class WireMockBekraftaBeslut extends WireMockRegelManuell
       map.put("arbetsgivare.api.base-url", server.baseUrl());
       map.put("referensdata.api.base-url", server.baseUrl());
       map.put("oul.api.base-url", server.baseUrl());
+      map.put("sid.api.base-url", server.baseUrl());
       return map;
    }
 }
