@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import se.fk.github.bekraftabeslut.logic.BekraftaBeslutService;
 import se.fk.rimfrost.framework.handlaggning.model.IndividYrkandeRoll;
-import se.fk.rimfrost.framework.regel.manuell.storage.ManuellRegelCommonDataStorage;
 import se.fk.rimfrost.adapter.arbetsgivare.ArbetsgivareAdapter;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.rimfrost.adapter.arbetsgivare.exception.ArbetsgivareErrorCode;
@@ -32,9 +31,9 @@ import se.fk.rimfrost.framework.handlaggning.model.ImmutableHandlaggning;
 import se.fk.rimfrost.framework.handlaggning.model.ImmutableYrkande;
 import se.fk.rimfrost.framework.handlaggning.model.ProduceratResultat;
 import se.fk.rimfrost.framework.handlaggning.model.Uppgift;
-import se.fk.rimfrost.framework.handlaggning.model.Yrkande;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellException;
-import se.fk.rimfrost.framework.regel.manuell.storage.entity.ManuellRegelCommonData;
+import se.fk.rimfrost.framework.regel.oul.logic.OulUppgiftService;
+import se.fk.rimfrost.framework.regel.oul.logic.entity.OulCorrelationData;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -70,7 +69,7 @@ public class BekraftaBeslutExceptionTest
    HandlaggningAdapter handlaggningAdapter;
 
    @InjectMock
-   ManuellRegelCommonDataStorage manuellRegelCommonDataStorage;
+   OulUppgiftService oulUppgiftService;
 
    @Inject
    BekraftaBeslutService bekraftaBeslutService;
@@ -182,12 +181,12 @@ public class BekraftaBeslutExceptionTest
             .yrkande(yrkande)
             .build();
 
-      var commonData = mock(ManuellRegelCommonData.class);
-      when(commonData.uppgift()).thenReturn(mock(Uppgift.class));
+      var correlationData = mock(OulCorrelationData.class);
+      when(correlationData.uppgift()).thenReturn(mock(Uppgift.class));
 
       when(handlaggningAdapter.readHandlaggning(Mockito.any())).thenReturn(updatedHandlaggning);
       when(referensdataAdapter.getYrkandestatusar()).thenReturn(createYrkandestatusar());
-      when(manuellRegelCommonDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
+      when(oulUppgiftService.getCorrelationData(Mockito.any())).thenReturn(correlationData);
 
       var exception = assertThrows(RegelManuellException.class,
             () -> bekraftaBeslutService.done(UUID.randomUUID()));
@@ -200,13 +199,13 @@ public class BekraftaBeslutExceptionTest
    void handlaggning_write_exception_maps_to_regel_manuell_exception(HandlaggningException.ErrorType errorType)
          throws HandlaggningException, ReferensdataException
    {
-      var commonData = mock(ManuellRegelCommonData.class);
-      when(commonData.uppgift()).thenReturn(mock(Uppgift.class));
+      var correlationData = mock(OulCorrelationData.class);
+      when(correlationData.uppgift()).thenReturn(mock(Uppgift.class));
 
       when(handlaggningAdapter.readHandlaggning(Mockito.any())).thenReturn(createHandlaggning());
       when(handlaggningAdapter.updateHandlaggning(Mockito.any())).thenThrow(new HandlaggningException(errorType, "test"));
       when(referensdataAdapter.getYrkandestatusar()).thenReturn(createYrkandestatusar());
-      when(manuellRegelCommonDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
+      when(oulUppgiftService.getCorrelationData(Mockito.any())).thenReturn(correlationData);
 
       var exception = assertThrows(RegelManuellException.class,
             () -> bekraftaBeslutService.done(UUID.randomUUID()));
@@ -277,9 +276,9 @@ public class BekraftaBeslutExceptionTest
    @Test
    void ersattning_not_found_exception_maps_to_regel_manuell_exception()
    {
-      var commonData = mock(ManuellRegelCommonData.class);
-      when(commonData.uppgift()).thenReturn(mock(Uppgift.class));
-      when(manuellRegelCommonDataStorage.getManuellRegelCommonData(Mockito.any())).thenReturn(commonData);
+      var correlationData = mock(OulCorrelationData.class);
+      when(correlationData.uppgift()).thenReturn(mock(Uppgift.class));
+      when(oulUppgiftService.getCorrelationData(Mockito.any())).thenReturn(correlationData);
 
       var exception = assertThrows(RegelManuellException.class,
             () -> bekraftaBeslutService.updateData(createHandlaggning(), newPatchDataRequest()));
@@ -325,10 +324,9 @@ public class BekraftaBeslutExceptionTest
     {
         return switch (errorType)
         {
-            case NOT_FOUND -> Response.Status.INTERNAL_SERVER_ERROR;
+            case NOT_FOUND, UNEXPECTED_ERROR -> Response.Status.INTERNAL_SERVER_ERROR;
             case BAD_REQUEST -> Response.Status.BAD_REQUEST;
             case SERVICE_UNAVAILABLE -> Response.Status.SERVICE_UNAVAILABLE;
-            case UNEXPECTED_ERROR -> Response.Status.INTERNAL_SERVER_ERROR;
         };
     }
 
@@ -336,10 +334,9 @@ public class BekraftaBeslutExceptionTest
     {
         return switch (errorCode)
         {
-            case NOT_FOUND -> Response.Status.INTERNAL_SERVER_ERROR;
+            case NOT_FOUND, UNEXPECTED_ERROR -> Response.Status.INTERNAL_SERVER_ERROR;
             case BAD_REQUEST -> Response.Status.BAD_REQUEST;
             case SERVICE_UNAVAILABLE -> Response.Status.SERVICE_UNAVAILABLE;
-            case UNEXPECTED_ERROR -> Response.Status.INTERNAL_SERVER_ERROR;
         };
     }
 
@@ -347,10 +344,9 @@ public class BekraftaBeslutExceptionTest
     {
         return switch (errorCode)
         {
-            case NOT_FOUND -> Response.Status.INTERNAL_SERVER_ERROR;
+            case NOT_FOUND, CONFLICT, UNEXPECTED_ERROR -> Response.Status.INTERNAL_SERVER_ERROR;
             case BAD_REQUEST -> Response.Status.BAD_REQUEST;
             case SERVICE_UNAVAILABLE -> Response.Status.SERVICE_UNAVAILABLE;
-            case UNEXPECTED_ERROR -> Response.Status.INTERNAL_SERVER_ERROR;
         };
     }
 
@@ -358,10 +354,9 @@ public class BekraftaBeslutExceptionTest
     {
         return switch (errorCode)
         {
-            case NOT_FOUND -> Response.Status.INTERNAL_SERVER_ERROR;
+            case NOT_FOUND, UNEXPECTED_ERROR -> Response.Status.INTERNAL_SERVER_ERROR;
             case BAD_REQUEST -> Response.Status.BAD_REQUEST;
             case SERVICE_UNAVAILABLE -> Response.Status.SERVICE_UNAVAILABLE;
-            case UNEXPECTED_ERROR -> Response.Status.INTERNAL_SERVER_ERROR;
         };
     }
 

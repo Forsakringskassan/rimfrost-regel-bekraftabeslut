@@ -47,7 +47,8 @@ public class BekraftaBeslutPatchDataTest extends AbstractRegelManuellTest
       var handlaggningPutUpdate = WireMockBekraftaBeslut.getLastPutHandlaggning(handlaggningId);
       assertEquals(handlaggningId, handlaggningPutUpdate.getHandlaggning().getId().toString());
       assertEquals(1, handlaggningPutUpdate.getHandlaggning().getVersion());
-      assertEquals("NY", handlaggningPutUpdate.getHandlaggning().getUppgift().getUppgiftStatus());
+      assertEquals("PLANERAD", handlaggningPutUpdate.getHandlaggning().getUppgift().getUppgiftStatus());
+      assertEquals(2, handlaggningPutUpdate.getHandlaggning().getYrkande().getVersion());
       assertEquals(1, handlaggningPutUpdate.getHandlaggning().getYrkande().getProduceradeResultat().size());
       var produceratResultat = handlaggningPutUpdate.getHandlaggning().getYrkande().getProduceradeResultat().getFirst();
       assertEquals(2, produceratResultat.getVersion());

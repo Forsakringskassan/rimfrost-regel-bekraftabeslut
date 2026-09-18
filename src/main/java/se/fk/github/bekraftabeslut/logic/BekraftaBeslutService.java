@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.fk.github.bekraftabeslut.logic.entity.Beslutsdata;
 import se.fk.github.bekraftabeslut.logic.entity.ImmutableBeslutsdata;
-import se.fk.rimfrost.framework.regel.manuell.storage.ManuellRegelCommonDataStorage;
 import se.fk.rimfrost.adapter.arbetsgivare.ArbetsgivareAdapter;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ImmutableArbetsgivareRequest;
@@ -43,6 +42,7 @@ import se.fk.rimfrost.framework.regel.logic.RegelUtils;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellException;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceBase;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceInterface;
+import se.fk.rimfrost.framework.regel.oul.logic.OulUppgiftService;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.UpdateErsattning;
@@ -70,7 +70,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    ReferensdataAdapter referensdataAdapter;
 
    @Inject
-   ManuellRegelCommonDataStorage dataStorage;
+   OulUppgiftService oulUppgiftService;
 
    @Override
    public GetDataResponse readData(Handlaggning handlaggning)
@@ -117,9 +117,11 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
 
       var updatedYrkandeWithBeslut = ImmutableYrkande.builder()
             .from(updatedYrkande)
+            .version(updatedYrkande.version() + 1)
             .beslut(beslut)
             .build();
 
+      logger.info("PATCH HandlaggningUpdate.yrkande version: {}", updatedYrkandeWithBeslut.version());
       return ImmutableHandlaggningUpdate.builder()
             .from(handlaggningUpdate)
             .yrkande(updatedYrkandeWithBeslut)
@@ -145,6 +147,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
 
       var updatedYrkande = ImmutableYrkande.builder()
             .from(handlaggning.yrkande())
+            .version(handlaggning.version() + 1)
             .yrkandeStatus(faststalltYrkandeStatus.id())
             .build();
 
@@ -166,6 +169,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             ? Utfall.JA
             : Utfall.NEJ;
 
+      logger.info("HandlaggningUpdate.yrkande version: {}", handlaggningUpdate.yrkande().version());
       updateHandlaggning(handlaggningUpdate);
 
       sendRegelResponse(handlaggningId, utfall);
@@ -225,7 +229,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
 
    private HandlaggningUpdate createHandlaggningUpdate(Handlaggning handlaggning)
    {
-      var commonData = dataStorage.getManuellRegelCommonData(handlaggning.id());
+      var correlationData = oulUppgiftService.getCorrelationData(handlaggning.id());
 
       return ImmutableHandlaggningUpdate.builder()
             .id(handlaggning.id())
@@ -235,7 +239,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .skapadTS(handlaggning.skapadTS())
             .avslutadTS(handlaggning.avslutadTS())
             .handlaggningspecifikationId(handlaggning.handlaggningspecifikationId())
-            .uppgift(commonData.uppgift())
+            .uppgift(correlationData.uppgift())
             .build();
    }
 

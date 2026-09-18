@@ -65,31 +65,4 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
       Assertions.assertEquals(BekraftaBeslutTestData.KUND_FORNAMN, getDataResponse.getKund().getFornamn());
       Assertions.assertEquals(BekraftaBeslutTestData.KUND_EFTERNAMN, getDataResponse.getKund().getEfternamn());
    }
-
-   @ParameterizedTest
-   @CsvSource(
-   {
-         "5367f6b8-cc4a-11f0-8de9-199901011234"
-   })
-   void get_data_should_update_handlaggning(String handlaggningId) throws JsonProcessingException
-   {
-      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
-      waitForRegelManuellReady(handlaggningId);
-      //
-      // clear wiremock requests
-      //
-      WireMockBekraftaBeslut.getWireMockServer().resetRequests();
-      //
-      // Send bekraftabeslut GET
-      //
-      sendGetBekraftaBeslut(handlaggningId);
-      //
-      // verify PUT handlaggning
-      //
-      var handlaggningPutUpdate = WireMockBekraftaBeslut.getLastPutHandlaggning(handlaggningId);
-      assertEquals(handlaggningId, handlaggningPutUpdate.getHandlaggning().getId().toString());
-      assertEquals(2, handlaggningPutUpdate.getHandlaggning().getVersion());
-      assertEquals("NY", handlaggningPutUpdate.getHandlaggning().getUppgift().getUppgiftStatus());
-      assertEquals(1, handlaggningPutUpdate.getHandlaggning().getUppgift().getVersion());
-   }
 }

@@ -49,27 +49,9 @@ public class BekraftaBeslutSequenceTest extends AbstractRegelManuellTest
       var handlaggningGetRequests = waitForHandlaggningRequests(handlaggningId, RequestMethod.GET, 1);
       assertEquals(1, handlaggningGetRequests.size());
       //
-      // mock status update from OUL
-      //
-      var utforarId = ImmutableIdtyp.builder()
-            .typId(idtypTypId)
-            .varde(idtypVarde)
-            .build();
-      oulKafkaConnector.simulateOulStatus(handlaggningId, uppgiftId, utforarId, null, RegelManuellTestStatus.NY, responseTopic);
-      //
-      // Verify PUT handlaggning
-      //
-      var handlaggningPutRequests = WireMockBekraftaBeslut.waitForHandlaggningRequests(handlaggningId, RequestMethod.PUT, 2);
-      assertEquals(2, handlaggningPutRequests.size());
-      //
       // mock GET operation requested from portal FE
       //
       sendGetBekraftaBeslut(handlaggningId);
-      //
-      // Verify PUT handlaggning
-      //
-      handlaggningPutRequests = WireMockBekraftaBeslut.waitForHandlaggningRequests(handlaggningId, RequestMethod.PUT, 3);
-      assertEquals(3, handlaggningPutRequests.size());
       //
       // mock GET operation requested from portal FE
       //
@@ -89,8 +71,8 @@ public class BekraftaBeslutSequenceTest extends AbstractRegelManuellTest
       //
       // Verify PUT handlaggning
       //
-      handlaggningPutRequests = WireMockBekraftaBeslut.waitForHandlaggningRequests(handlaggningId, RequestMethod.PUT, 4);
-      assertEquals(4, handlaggningPutRequests.size());
+      var handlaggningPutRequests = WireMockBekraftaBeslut.waitForHandlaggningRequests(handlaggningId, RequestMethod.PUT, 2);
+      assertEquals(1, handlaggningPutRequests.size());
       //
       // mock POST operation from portal FE
       //
@@ -98,8 +80,8 @@ public class BekraftaBeslutSequenceTest extends AbstractRegelManuellTest
       //
       // Verify PUT handlaggning
       //
-      handlaggningPutRequests = WireMockBekraftaBeslut.waitForHandlaggningRequests(handlaggningId, RequestMethod.PUT, 5);
-      assertEquals(6, handlaggningPutRequests.size());
+      handlaggningPutRequests = WireMockBekraftaBeslut.waitForHandlaggningRequests(handlaggningId, RequestMethod.PUT, 4);
+      assertEquals(3, handlaggningPutRequests.size());
       //
       // Verify produced regel response
       //
