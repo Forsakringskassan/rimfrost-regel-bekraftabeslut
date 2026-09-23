@@ -2,6 +2,12 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 1.1.9 (2026-09-23)
+
+### Bug Fixes
+
+-  Bump dependency versions in preparation for 1.2 ([953d7](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/953d7036219f50c) Lars Persson)  
+
 ## 1.1.8 (2026-09-18)
 
 ### Bug Fixes
