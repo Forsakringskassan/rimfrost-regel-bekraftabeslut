@@ -6,8 +6,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import se.fk.rimfrost.framework.oul.logic.dto.ImmutableIdtyp;
-import se.fk.rimfrost.framework.regel.manuell.base.RegelManuellTestStatus;
 import se.fk.rimfrost.framework.regel.Utfall;
 import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 

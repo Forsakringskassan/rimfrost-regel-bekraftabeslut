@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 import se.fk.rimfrost.framework.regel.oul.logic.exception.OulServiceException;
-import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.PutHandlaggningRequest;
+import se.fk.rimfrost.jaxrsspec.controllers.generatedsource.model.HandlaggningUpdate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendPostBekraftaBeslut;
@@ -46,11 +46,11 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
       //
       // verify PUT handlaggning
       //
-      var handlaggningPutUpdate = WireMockBekraftaBeslut.getLastPutHandlaggning(handlaggningId);
+      var handlaggningPutUpdate = WireMockBekraftaBeslut.getLastPutHandlaggningUpdate(handlaggningId);
       assertEquals(handlaggningId, handlaggningPutUpdate.getHandlaggning().getId().toString());
       assertEquals(1, handlaggningPutUpdate.getHandlaggning().getVersion());
-      assertEquals(2, handlaggningPutUpdate.getHandlaggning().getUppgift().getVersion());
-      assertEquals("AVSLUTAD", handlaggningPutUpdate.getHandlaggning().getUppgift().getUppgiftStatus());
+      assertEquals(2, handlaggningPutUpdate.getUppgift().getVersion());
+      assertEquals("AVSLUTAD", handlaggningPutUpdate.getUppgift().getUppgiftStatus());
    }
 
    @ParameterizedTest
@@ -96,7 +96,7 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
       var handlaggningPutUpdates = WireMockBekraftaBeslut.waitForHandlaggningRequests(handlaggningId, RequestMethod.PUT, 2);
       assertEquals(2, handlaggningPutUpdates.size());
       var handlaggningPutUpdate = mapper.readValue(handlaggningPutUpdates.getFirst().getBodyAsString(),
-            PutHandlaggningRequest.class);
+            HandlaggningUpdate.class);
       assertEquals(handlaggningId, handlaggningPutUpdate.getHandlaggning().getId().toString());
       assertEquals(1, handlaggningPutUpdate.getHandlaggning().getVersion());
       assertEquals(2, handlaggningPutUpdate.getHandlaggning().getYrkande().getVersion());

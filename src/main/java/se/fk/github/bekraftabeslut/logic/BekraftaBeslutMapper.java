@@ -21,7 +21,9 @@ import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generat
 @ApplicationScoped
 public class BekraftaBeslutMapper
 {
-   Logger logger = LoggerFactory.getLogger(BekraftaBeslutMapper.class);
+   public static final String ERSATTNING_OBJEKT_TYP_ID = "ersattning";
+
+   private final Logger logger = LoggerFactory.getLogger(BekraftaBeslutMapper.class);
 
    public GetDataResponse toBekraftaBeslutResponse(Handlaggning handlaggningsResponse,
          FolkbokfordResponse folkbokfordResponse,
@@ -29,8 +31,8 @@ public class BekraftaBeslutMapper
          ObjectMapper objectMapper)
    {
       var ersattningsList = new ArrayList<Ersattning>();
-      var ersattningResult = handlaggningsResponse.yrkande().produceradeResultat().stream()
-            .filter(pr -> pr.typ().equalsIgnoreCase("ersattning")).toList();
+      var ersattningResult = handlaggningsResponse.yrkande().sakfragorStallningstaganden().stream()
+            .filter(pr -> pr.objektTypId().equalsIgnoreCase(ERSATTNING_OBJEKT_TYP_ID)).toList();
 
       for (var yrkandeErsattning : ersattningResult)
       {
@@ -52,9 +54,9 @@ public class BekraftaBeslutMapper
          ersattning.setBelopp(data.getBelopp());
          ersattning.setBerakningsgrund(data.getBerakningsgrund());
          ersattning.setBeslutsutfall(mapBeslutsutfallEnum(data.getBeslutsutfall()));
-         ersattning.setAvslagsanledning(yrkandeErsattning.avslagsanledning());
-         ersattning.setFrom(yrkandeErsattning.resultatFrom().toLocalDate());
-         ersattning.setTom(yrkandeErsattning.resultatTom().toLocalDate());
+         ersattning.setAvslagsanledning(data.getAvslagsanledning());
+         ersattning.setFrom(data.getFrom());
+         ersattning.setTom(data.getTom());
 
          ersattningsList.add(ersattning);
       }

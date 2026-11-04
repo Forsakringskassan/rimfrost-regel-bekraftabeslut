@@ -1,11 +1,14 @@
 package se.fk.github.bekraftabeslut;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import se.fk.rimfrost.ersattningdata.ErsattningData;
 import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +26,9 @@ public class BekraftaBeslutPatchDataTest extends AbstractRegelManuellTest
 {
    @ConfigProperty(name = "mp.messaging.outgoing.regel-responses.topic")
    String responseTopic;
+
+   @Inject
+   ObjectMapper objectMapper;
 
    @ParameterizedTest
    @CsvSource(
@@ -44,18 +50,21 @@ public class BekraftaBeslutPatchDataTest extends AbstractRegelManuellTest
       //
       // verify PUT handlaggning
       //
-      var handlaggningPutUpdate = WireMockBekraftaBeslut.getLastPutHandlaggning(handlaggningId);
+      var handlaggningPutUpdate = WireMockBekraftaBeslut.getLastPutHandlaggningUpdate(handlaggningId);
       assertEquals(handlaggningId, handlaggningPutUpdate.getHandlaggning().getId().toString());
       assertEquals(1, handlaggningPutUpdate.getHandlaggning().getVersion());
-      assertEquals("PLANERAD", handlaggningPutUpdate.getHandlaggning().getUppgift().getUppgiftStatus());
+      assertEquals("PLANERAD", handlaggningPutUpdate.getUppgift().getUppgiftStatus());
       assertEquals(2, handlaggningPutUpdate.getHandlaggning().getYrkande().getVersion());
-      assertEquals(1, handlaggningPutUpdate.getHandlaggning().getYrkande().getProduceradeResultat().size());
-      var produceratResultat = handlaggningPutUpdate.getHandlaggning().getYrkande().getProduceradeResultat().getFirst();
-      assertEquals(2, produceratResultat.getVersion());
-      assertEquals(PRODUCERADE_RESULTAT_ID, produceratResultat.getId().toString());
-      assertEquals("16bd3d95-8fad-4f9c-a87a-ba146db55c9b", produceratResultat.getYrkandestatus());
-      var beslut = handlaggningPutUpdate.getHandlaggning().getYrkande().getBeslut();
-      assertNotNull(beslut);
+      assertEquals(1, handlaggningPutUpdate.getHandlaggning().getYrkande().getSakfragorStallningstaganden().size());
+      var sakfragorStallningstagandenContainer = handlaggningPutUpdate.getHandlaggning().getYrkande()
+            .getSakfragorStallningstaganden().getFirst();
+      var ersattningData = ErsattningData.fromJson(sakfragorStallningstagandenContainer.getData(), objectMapper);
+      assertEquals(2, ersattningData.getVersion());
+      assertEquals(PRODUCERADE_RESULTAT_ID, sakfragorStallningstagandenContainer.getId().toString());
+      assertEquals("16bd3d95-8fad-4f9c-a87a-ba146db55c9b", ersattningData.getYrkandeStatus());
+      assertNotNull(handlaggningPutUpdate.getHandlaggning().getYrkande().getBeslut());
+      assertEquals(1, handlaggningPutUpdate.getHandlaggning().getYrkande().getBeslut().size());
+      var beslut = handlaggningPutUpdate.getHandlaggning().getYrkande().getBeslut().getFirst();
       assertEquals(1, beslut.getVersion());
       assertEquals(1, beslut.getBeslutsrader().size());
       var beslutsrad = beslut.getBeslutsrader().getFirst();
