@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -42,16 +41,18 @@ import se.fk.rimfrost.framework.regel.logic.RegelUtils;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellException;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceBase;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellServiceInterface;
+import se.fk.rimfrost.framework.regel.manuell.logic.identity.UserIdentityHolder;
 import se.fk.rimfrost.framework.regel.oul.logic.OulUppgiftService;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.GetDataResponse;
 import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.PatchDataRequest;
-import se.fk.rimfrost.regel.bekraftabeslut.openapi.jaxrsspec.controllers.generatedsource.model.UpdateErsattning;
 
 @ApplicationScoped
 @Startup
 public class BekraftaBeslutService extends RegelManuellServiceBase
       implements RegelManuellServiceInterface<GetDataResponse, PatchDataRequest>
 {
+   public static final String ERSATTNING_OBJEKT_TYP_ID = "ersattning";
+
    private final Logger logger = LoggerFactory.getLogger(BekraftaBeslutService.class);
 
    @Inject
@@ -72,13 +73,16 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    @Inject
    OulUppgiftService oulUppgiftService;
 
+   @Inject
+   UserIdentityHolder userIdentityHolder;
+
    @Override
    public GetDataResponse readData(Handlaggning handlaggning)
    {
-      IndividYrkandeRoll yrkandeIndivid;
+      RollIYrkande yrkandeIndivid;
       try
       {
-         yrkandeIndivid = findYrkandeIndivid(handlaggning.yrkande().individYrkandeRoller()).orElseThrow();
+         yrkandeIndivid = findYrkandeIndivid(handlaggning.yrkande().rollerIYrkande()).orElseThrow();
       }
       catch (NoSuchElementException e)
       {
@@ -100,9 +104,50 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    @Override
    public HandlaggningUpdate updateData(Handlaggning handlaggning, PatchDataRequest request)
    {
-      var handlaggningUpdate = createHandlaggningUpdate(handlaggning);
-      var updatedErsattningar = request.getErsattningar().stream().map(e -> createUpdatedProduceratResultat(handlaggning, e))
-            .toList();
+      var correlationData = oulUppgiftService.getCorrelationData(handlaggning.id());
+
+      if (correlationData == null)
+      {
+         logger.error("Failed to find correlation data for id: {}", handlaggning.id());
+         throw new RegelManuellException(Response.Status.INTERNAL_SERVER_ERROR, "Internal Server Error");
+      }
+
+      var ersattningContainersById = handlaggning.yrkande().sakfragorStallningstaganden().stream()
+            .filter(c -> c.objektTypId().equalsIgnoreCase(ERSATTNING_OBJEKT_TYP_ID))
+            .collect(Collectors.toMap(SakfragaStallningstagandeContainer::id, Function.identity(), (first, second) -> first));
+
+      List<SakfragaStallningstagandeContainer> updatedErsattningContainers = new ArrayList<>();
+      List<Uppgiftsdata> underlag = new ArrayList<>();
+      List<ErsattningData> updatedErsattningar = new ArrayList<>();
+      for (var ersattningUpdate : request.getErsattningar())
+      {
+         if (ersattningUpdate == null)
+         {
+            continue;
+         }
+
+         var ersattningId = ersattningUpdate.getErsattningId();
+         var container = ersattningContainersById.get(ersattningId);
+
+         if (container == null)
+         {
+            logger.warn("Failed to locate SakfragaStallningstagandeContainer with id {} for handlaggning with id {}",
+                  ersattningId, handlaggning.id());
+            throw new RegelManuellException(Response.Status.BAD_REQUEST, "Failed to locate ersattning with id " + ersattningId);
+         }
+
+         var ersattning = parseErsattning(container);
+
+         underlag.add(RegelUtils.createUppgiftsdatakoppling(ersattning.getId().toString(), ersattning.getVersion()));
+
+         ersattning.setYrkandeStatus(ersattningUpdate.getYrkandestatus());
+         ersattning.setVersion(ersattning.getVersion() + 1);
+
+         updatedErsattningar.add(ersattning);
+
+         updatedErsattningContainers.add(
+               RegelUtils.createSakfragaStallningstagande(container.id(), container.objektTypId(), ersattning, objectMapper));
+      }
 
       var beslutsdata = ImmutableBeslutsdata.builder()
             .avslutstyp(request.getBeslut().getAvslutstyp())
@@ -110,21 +155,32 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .beslutsutfall(request.getBeslut().getBeslutsutfall())
             .build();
 
-      var beslut = createBeslut(handlaggning.id(), updatedErsattningar, beslutsdata);
+      var beslut = createBeslut(
+            updatedErsattningar, beslutsdata);
 
-      var updatedYrkande = RegelUtils.createYrkandeWithUpdatedProduceradeResultat(handlaggningUpdate.yrkande(),
-            updatedErsattningar);
+      var updatedYrkande = RegelUtils.createYrkandeWithUpdatedSakfragorStallningstaganden(handlaggning.yrkande(),
+            updatedErsattningContainers);
 
       var updatedYrkandeWithBeslut = ImmutableYrkande.builder()
             .from(updatedYrkande)
             .version(updatedYrkande.version() + 1)
-            .beslut(beslut)
+            .addBeslut(beslut)
+            .build();
+
+      var updatedUppgift = ImmutableUppgift.builder()
+            .from(correlationData.uppgift())
+            .addAllUnderlag(underlag)
+            .build();
+
+      var updatedHandlaggning = ImmutableHandlaggning.builder()
+            .from(handlaggning)
+            .yrkande(updatedYrkandeWithBeslut)
             .build();
 
       logger.info("PATCH HandlaggningUpdate.yrkande version: {}", updatedYrkandeWithBeslut.version());
       return ImmutableHandlaggningUpdate.builder()
-            .from(handlaggningUpdate)
-            .yrkande(updatedYrkandeWithBeslut)
+            .handlaggning(updatedHandlaggning)
+            .uppgift(updatedUppgift)
             .build();
    }
 
@@ -151,13 +207,18 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .yrkandeStatus(faststalltYrkandeStatus.id())
             .build();
 
-      var handlaggningUpdate = ImmutableHandlaggningUpdate.builder()
-            .from(createHandlaggningUpdate(handlaggning))
+      var updatedHandlaggning = ImmutableHandlaggning.builder()
+            .from(handlaggning)
             .yrkande(updatedYrkande)
             .build();
 
-      var ersattningResultats = handlaggning.yrkande().produceradeResultat().stream()
-            .filter(pr -> pr.typ().equalsIgnoreCase("ersattning")).toList();
+      var handlaggningUpdate = ImmutableHandlaggningUpdate.builder()
+            .from(createHandlaggningUpdate(handlaggning))
+            .handlaggning(updatedHandlaggning)
+            .build();
+
+      var ersattningResultats = handlaggning.yrkande().sakfragorStallningstaganden().stream()
+            .filter(pr -> pr.objektTypId().equalsIgnoreCase(ERSATTNING_OBJEKT_TYP_ID)).toList();
 
       List<ErsattningData> ersattningar = new ArrayList<>();
       for (var ersattningResultat : ersattningResultats)
@@ -169,7 +230,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             ? Utfall.JA
             : Utfall.NEJ;
 
-      logger.info("HandlaggningUpdate.yrkande version: {}", handlaggningUpdate.yrkande().version());
+      logger.info("HandlaggningUpdate.yrkande version: {}", handlaggningUpdate.handlaggning().yrkande().version());
       updateHandlaggning(handlaggningUpdate);
 
       sendRegelResponse(handlaggningId, utfall);
@@ -231,22 +292,22 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
    {
       var correlationData = oulUppgiftService.getCorrelationData(handlaggning.id());
 
+      if (correlationData == null)
+      {
+         logger.error("Failed to read correlation data for handlaggning with id: {}", handlaggning.id());
+         throw new RegelManuellException(Response.Status.INTERNAL_SERVER_ERROR, "Internal Server Error");
+      }
+
       return ImmutableHandlaggningUpdate.builder()
-            .id(handlaggning.id())
-            .version(handlaggning.version())
-            .yrkande(handlaggning.yrkande())
-            .processInstansId(Objects.requireNonNull(handlaggning.processInstansId()))
-            .skapadTS(handlaggning.skapadTS())
-            .avslutadTS(handlaggning.avslutadTS())
-            .handlaggningspecifikationId(handlaggning.handlaggningspecifikationId())
+            .handlaggning(handlaggning)
             .uppgift(correlationData.uppgift())
             .build();
    }
 
-   private Beslut createBeslut(UUID handlaggningsId, List<ProduceratResultat> produceratResultat, Beslutsdata beslutsdata)
+   private Beslut createBeslut(List<ErsattningData> updatedErsattningList, Beslutsdata beslutsdata)
    {
-      List<ProduceratResultatRef> beslutsref = produceratResultat.stream()
-            .map(pr -> (ProduceratResultatRef) ImmutableProduceratResultatRef.builder().id(pr.id()).version(pr.version()).build())
+      List<SakfragaStallningstagandeRef> beslutsref = updatedErsattningList.stream()
+            .map(this::createSakfragaStallningstagandeRef)
             .toList();
 
       var beslutsrad = ImmutableBeslutsrad.builder()
@@ -255,12 +316,14 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .avslutsTyp(beslutsdata.avslutstyp())
             .beslutsTyp(beslutsdata.beslutstyp())
             .beslutsUtfall(beslutsdata.beslutsutfall())
-            .produceradeResultatRef(beslutsref)
+            .sakfragorStallningstaganden(beslutsref)
             .build();
 
+      var handlaggareId = userIdentityHolder.getIdentity();
+
       var beslutsfattare = ImmutableIdtyp.builder() // TODO: Replace with id for handlaggare when available
-            .typId(UUID.randomUUID().toString())
-            .varde(UUID.randomUUID().toString())
+            .typId(handlaggareId.typId())
+            .varde(handlaggareId.varde())
             .build();
 
       return ImmutableBeslut.builder()
@@ -272,7 +335,7 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
             .build();
    }
 
-   private Optional<IndividYrkandeRoll> findYrkandeIndivid(List<IndividYrkandeRoll> individer)
+   private Optional<RollIYrkande> findYrkandeIndivid(List<RollIYrkande> individer)
    {
       Map<String, Referensdata> yrkandeRollerMap = null;
       try
@@ -324,26 +387,23 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       return apiReferensdata;
    }
 
-   private ProduceratResultat createUpdatedProduceratResultat(Handlaggning handlaggning, UpdateErsattning ersattningUpdate)
+   private SakfragaStallningstagandeRef createSakfragaStallningstagandeRef(ErsattningData updatedErsattningData)
    {
-      ProduceratResultat ersattningResult;
+      return ImmutableSakfragaStallningstagandeRef.builder().id(updatedErsattningData.getId())
+            .version(updatedErsattningData.getVersion()).build();
+   }
+
+   private ErsattningData parseErsattning(SakfragaStallningstagandeContainer container)
+   {
       try
       {
-         ersattningResult = handlaggning.yrkande().produceradeResultat().stream()
-               .filter(pr -> pr.id().equals(ersattningUpdate.getErsattningId())).findFirst().orElseThrow();
+         return ErsattningData.fromJson(container.data(), objectMapper);
       }
-      catch (NoSuchElementException e)
+      catch (RuntimeException e)
       {
-         logger.error("Failed to locate ProduceratResultat with id {}", ersattningUpdate.getErsattningId(), e);
-         throw new RegelManuellException(Response.Status.BAD_REQUEST,
-               "Failed to locate ersattning with id " + ersattningUpdate.getErsattningId());
+         logger.error("Failed to parse json as ErsattningData", e);
+         throw new RegelManuellException(Response.Status.INTERNAL_SERVER_ERROR, "Internal Server Error");
       }
-
-      return ImmutableProduceratResultat.builder()
-            .from(ersattningResult)
-            .version(ersattningResult.version() + 1)
-            .yrkandeStatus(ersattningUpdate.getYrkandestatus())
-            .build();
    }
 
    private FolkbokfordResponse getFolkbokfordInfo(String personnummer, UUID handlaggningId)
@@ -428,7 +488,8 @@ public class BekraftaBeslutService extends RegelManuellServiceBase
       }
       catch (HandlaggningException e)
       {
-         logger.error("Failed to write handlaggning information for handlaggning id: {}. {}: {}", handlaggningUpdate.id(),
+         logger.error("Failed to write handlaggning information for handlaggning id: {}. {}: {}",
+               handlaggningUpdate.handlaggning().id(),
                e.getErrorType(), e.getMessage());
          throw mapToRegelManuellException(e.getErrorType(), e.getMessage());
       }

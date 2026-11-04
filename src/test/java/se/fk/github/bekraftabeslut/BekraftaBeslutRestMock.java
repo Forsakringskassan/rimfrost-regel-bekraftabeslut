@@ -13,37 +13,42 @@ public class BekraftaBeslutRestMock
 {
    public static GetDataResponse sendGetBekraftaBeslut(String handlaggningId)
    {
-      return given().when().get("/regel/bekraftabeslut/{handlaggningId}", handlaggningId).then().statusCode(200).extract()
-            .as(GetDataResponse.class);
+      return given().header("Authorization", "Bearer ID_TYP:ID_VARDE").when()
+            .get("/regel/bekraftabeslut/{handlaggningId}", handlaggningId).then().statusCode(200).extract().jsonPath()
+            .getObject("data", GetDataResponse.class);
    }
 
    public static void sendPatchBekraftaBeslut(String handlaggningId, PatchDataRequest patchDataRequest)
    {
-      given().contentType(ContentType.JSON).body(patchDataRequest).when()
+      given().contentType(ContentType.JSON).body(patchDataRequest).header("Authorization", "Bearer ID_TYP:ID_VARDE").when()
             .patch("/regel/bekraftabeslut/{handlaggningId}", handlaggningId)
             .then().statusCode(204);
    }
 
    public static void sendPostBekraftaBeslut(String handlaggningId)
    {
-      given().when().post("/regel/bekraftabeslut/{handlaggningId}/done", handlaggningId).then().statusCode(204);
+      given().header("Authorization", "Bearer ID_TYP:ID_VARDE").when()
+            .post("/regel/bekraftabeslut/{handlaggningId}/done", handlaggningId).then().statusCode(204);
    }
 
    public static List<Referensdata> sendGetAvslutstypBekraftaBeslut()
    {
-      return given().when().get("/regel/bekraftabeslut/avslutstyp").then().statusCode(200).extract()
+      return given().header("Authorization", "Bearer ID_TYP:ID_VARDE").when().get("/regel/bekraftabeslut/avslutstyp").then()
+            .statusCode(200).extract()
             .jsonPath().getList(".", Referensdata.class);
    }
 
    public static List<Referensdata> sendGetBeslutstypBekraftaBeslut()
    {
-      return given().when().get("/regel/bekraftabeslut/beslutstyp").then().statusCode(200).extract()
+      return given().header("Authorization", "Bearer ID_TYP:ID_VARDE").when().get("/regel/bekraftabeslut/beslutstyp").then()
+            .statusCode(200).extract()
             .jsonPath().getList(".", Referensdata.class);
    }
 
    public static List<Referensdata> sendGetBeslutsutfallstypBekraftaBeslut()
    {
-      return given().when().get("/regel/bekraftabeslut/beslutsutfallstyp").then().statusCode(200).extract()
+      return given().header("Authorization", "Bearer ID_TYP:ID_VARDE").when().get("/regel/bekraftabeslut/beslutsutfallstyp")
+            .then().statusCode(200).extract()
             .jsonPath().getList(".", Referensdata.class);
    }
 }

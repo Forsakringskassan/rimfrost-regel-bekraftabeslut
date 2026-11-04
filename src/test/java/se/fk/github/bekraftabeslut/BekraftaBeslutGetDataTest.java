@@ -1,6 +1,5 @@
 package se.fk.github.bekraftabeslut;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -9,7 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import se.fk.rimfrost.framework.regel.manuell.base.AbstractRegelManuellTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendGetBekraftaBeslut;
 
 @QuarkusTest

@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import se.fk.github.bekraftabeslut.logic.BekraftaBeslutService;
-import se.fk.rimfrost.framework.handlaggning.model.IndividYrkandeRoll;
 import se.fk.rimfrost.adapter.arbetsgivare.ArbetsgivareAdapter;
 import se.fk.rimfrost.adapter.arbetsgivare.dto.ArbetsgivareResponse;
 import se.fk.rimfrost.adapter.arbetsgivare.exception.ArbetsgivareErrorCode;
@@ -29,7 +28,8 @@ import se.fk.rimfrost.framework.handlaggning.exception.HandlaggningException;
 import se.fk.rimfrost.framework.handlaggning.model.Handlaggning;
 import se.fk.rimfrost.framework.handlaggning.model.ImmutableHandlaggning;
 import se.fk.rimfrost.framework.handlaggning.model.ImmutableYrkande;
-import se.fk.rimfrost.framework.handlaggning.model.ProduceratResultat;
+import se.fk.rimfrost.framework.handlaggning.model.RollIYrkande;
+import se.fk.rimfrost.framework.handlaggning.model.SakfragaStallningstagandeContainer;
 import se.fk.rimfrost.framework.handlaggning.model.Uppgift;
 import se.fk.rimfrost.framework.regel.manuell.logic.RegelManuellException;
 import se.fk.rimfrost.framework.regel.oul.logic.OulUppgiftService;
@@ -116,12 +116,12 @@ public class BekraftaBeslutExceptionTest
    void invalid_ersattningdata_maps_to_regel_manuell_exception()
          throws ReferensdataException, FolkbokfordException, ArbetsgivareException
    {
-      var produceratResultat = mock(ProduceratResultat.class, Mockito.RETURNS_DEEP_STUBS);
-      when(produceratResultat.data()).thenReturn("(:?");
-      when(produceratResultat.typ()).thenReturn("ersattning");
+      var sakfragaStallningstagandeContainer = mock(SakfragaStallningstagandeContainer.class, Mockito.RETURNS_DEEP_STUBS);
+      when(sakfragaStallningstagandeContainer.data()).thenReturn("(:?");
+      when(sakfragaStallningstagandeContainer.objektTypId()).thenReturn("ersattning");
 
       var handlaggning = handlaggningMock();
-      when(handlaggning.yrkande().produceradeResultat()).thenReturn(List.of(produceratResultat));
+      when(handlaggning.yrkande().sakfragorStallningstaganden()).thenReturn(List.of(sakfragaStallningstagandeContainer));
 
       when(referensdataAdapter.getYrkanderoller()).thenReturn(createYrkandeRoller());
       when(folkbokfordAdapter.getFolkbokfordInfo(any()))
@@ -167,14 +167,14 @@ public class BekraftaBeslutExceptionTest
    @Test
    void invalid_ersattningdata_maps_to_regel_manuell_exception_in_done() throws HandlaggningException, ReferensdataException
    {
-      var produceratResultat = mock(ProduceratResultat.class, Mockito.RETURNS_DEEP_STUBS);
-      when(produceratResultat.data()).thenReturn("(:?");
-      when(produceratResultat.typ()).thenReturn("ersattning");
+      var sakfragaStallningstagandeContainer = mock(SakfragaStallningstagandeContainer.class, Mockito.RETURNS_DEEP_STUBS);
+      when(sakfragaStallningstagandeContainer.data()).thenReturn("(:?");
+      when(sakfragaStallningstagandeContainer.objektTypId()).thenReturn("ersattning");
 
       var handlaggning = createHandlaggning();
       var yrkande = ImmutableYrkande.builder()
             .from(handlaggning.yrkande())
-            .produceradeResultat(List.of(produceratResultat))
+            .sakfragorStallningstaganden(List.of(sakfragaStallningstagandeContainer))
             .build();
       var updatedHandlaggning = ImmutableHandlaggning.builder()
             .from(handlaggning)
@@ -362,12 +362,12 @@ public class BekraftaBeslutExceptionTest
 
    private static Handlaggning handlaggningMock()
    {
-      var individYrkandeRoll = mock(IndividYrkandeRoll.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+      var rollIYrkande = mock(RollIYrkande.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
       var handlaggning = mock(Handlaggning.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
-      when(handlaggning.yrkande().individYrkandeRoller())
-            .thenReturn(List.of(individYrkandeRoll));
-      when(individYrkandeRoll.individ().varde()).thenReturn("19901010-1234");
-      when(individYrkandeRoll.yrkandeRollId())
+      when(handlaggning.yrkande().rollerIYrkande())
+            .thenReturn(List.of(rollIYrkande));
+      when(rollIYrkande.individ().varde()).thenReturn("19901010-1234");
+      when(rollIYrkande.yrkandeRollId())
             .thenReturn(yrkandeRollId);
       return handlaggning;
    }
@@ -377,22 +377,22 @@ public class BekraftaBeslutExceptionTest
       var yrkande = ImmutableYrkande.builder()
             .id(UUID.randomUUID())
             .version(1)
-            .erbjudandeId(UUID.randomUUID().toString())
+            .ingangtypId(UUID.randomUUID().toString())
             .yrkandeDatum(OffsetDateTime.now())
             .yrkandeStatus("faststallt")
             .yrkandeFrom(OffsetDateTime.now())
             .yrkandeTom(OffsetDateTime.now())
             .avsikt("avsikt")
-            .individYrkandeRoller(List.of())
-            .produceradeResultat(List.of())
-            .beslut(null)
+            .rollerIYrkande(List.of())
+            .sakfragorStallningstaganden(List.of())
+            .beslut(List.of())
             .build();
 
       return ImmutableHandlaggning.builder()
             .id(UUID.randomUUID())
             .version(1)
             .yrkande(yrkande)
-            .processInstansId(UUID.randomUUID())
+            .handlaggningIdTyp(UUID.randomUUID().toString())
             .skapadTS(OffsetDateTime.now())
             .handlaggningspecifikationId(UUID.randomUUID())
             .build();
