@@ -26,9 +26,6 @@ import static se.fk.rimfrost.framework.regel.WireMockHandlaggning.waitForHandlag
 })
 public class BekraftaBeslutSequenceTest extends AbstractRegelManuellTest
 {
-   @ConfigProperty(name = "mp.messaging.outgoing.regel-responses.topic")
-   String responseTopic;
-
    @ParameterizedTest
    @CsvSource(
    {
@@ -40,7 +37,7 @@ public class BekraftaBeslutSequenceTest extends AbstractRegelManuellTest
          String idtypTypId,
          String idtypVarde)
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
       //
       // Verify GET handläggning requested
       //

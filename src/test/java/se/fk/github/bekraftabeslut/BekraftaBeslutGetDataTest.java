@@ -17,9 +17,6 @@ import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendGetBekrafta
 })
 public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
 {
-   @ConfigProperty(name = "mp.messaging.outgoing.regel-responses.topic")
-   String responseTopic;
-
    @ParameterizedTest
    @CsvSource(
    {
@@ -27,7 +24,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    })
    void get_data_should_contain_handlaggning_id(String handlaggningId)
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
       waitForRegelManuellReady(handlaggningId);
       var getDataResponse = sendGetBekraftaBeslut(handlaggningId);
       Assertions.assertEquals(handlaggningId, getDataResponse.getHandlaggningId().toString());
@@ -40,7 +37,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    })
    void get_data_should_contain_ersattningar(String handlaggningId)
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
       waitForRegelManuellReady(handlaggningId);
       var getDataResponse = sendGetBekraftaBeslut(handlaggningId);
       Assertions.assertEquals(1, getDataResponse.getErsattning().size());
@@ -57,7 +54,7 @@ public class BekraftaBeslutGetDataTest extends AbstractRegelManuellTest
    })
    void get_data_should_contain_kund(String handlaggningId)
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
       waitForRegelManuellReady(handlaggningId);
       var getDataResponse = sendGetBekraftaBeslut(handlaggningId);
       Assertions.assertEquals(BekraftaBeslutTestData.KUND_FORNAMN, getDataResponse.getKund().getFornamn());

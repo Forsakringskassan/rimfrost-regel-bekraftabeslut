@@ -22,9 +22,6 @@ import static se.fk.github.bekraftabeslut.BekraftaBeslutRestMock.sendPostBekraft
 })
 public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
 {
-   @ConfigProperty(name = "mp.messaging.outgoing.regel-responses.topic")
-   String responseTopic;
-
    @ParameterizedTest
    @CsvSource(
    {
@@ -33,7 +30,7 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
    void post_data_done_should_update_handlaggning_uppgift_avslutad(String handlaggningId, String uppgiftId)
          throws JsonProcessingException
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
       waitForRegelManuellReady(handlaggningId);
       //
       // clear wiremock requests
@@ -60,7 +57,7 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
    })
    void post_data_done_should_update_oul_status(String handlaggningId, String uppgiftId) throws OulServiceException
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
       waitForRegelManuellReady(handlaggningId);
       //
       // mock POST done operation from portal FE
@@ -80,7 +77,7 @@ public class BekraftaBeslutPostDataTest extends AbstractRegelManuellTest
    void post_data_done_should_update_yrkande_faststalld(String handlaggningId, String uppgiftId, String yrkandestatus)
          throws JsonProcessingException
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
       waitForRegelManuellReady(handlaggningId);
       //
       // clear wiremock requests

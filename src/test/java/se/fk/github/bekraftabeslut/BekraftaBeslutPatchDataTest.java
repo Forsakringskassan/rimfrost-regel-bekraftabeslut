@@ -24,9 +24,6 @@ import static se.fk.github.bekraftabeslut.BekraftaBeslutTestData.newPatchDataReq
 })
 public class BekraftaBeslutPatchDataTest extends AbstractRegelManuellTest
 {
-   @ConfigProperty(name = "mp.messaging.outgoing.regel-responses.topic")
-   String responseTopic;
-
    @Inject
    ObjectMapper objectMapper;
 
@@ -37,7 +34,7 @@ public class BekraftaBeslutPatchDataTest extends AbstractRegelManuellTest
    })
    void patch_data_should_update_handlaggning(String handlaggningId) throws JsonProcessingException
    {
-      regelKafkaConnector.sendRegelRequest(handlaggningId, responseTopic);
+      regelKafkaConnector.sendRegelRequest(handlaggningId);
       waitForRegelManuellReady(handlaggningId);
       //
       // clear wiremock requests
