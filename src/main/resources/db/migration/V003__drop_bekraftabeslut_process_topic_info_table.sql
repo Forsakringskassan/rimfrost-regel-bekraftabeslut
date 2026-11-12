@@ -1,0 +1,1 @@
+DROP TABLE bekraftabeslut_process_topic_info;
