@@ -2,6 +2,19 @@
 
 Changelog of rimfrost-regel-bekraftabeslut.
 
+## 1.2.1 (2026-11-23)
+
+### Bug Fixes
+
+-  Bump dependencies ([a6e04](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/a6e04613e1cfaeb) Lars Persson)  
+-  **deps**  update dependency se.fk.rimfrost.adapter.arbetsgivare:rimfrost-adapter-arbetsgivare to v1.1.8 ([ba68c](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/ba68c7e58d994a9) renovate[bot])  
+-  Add regelutfall and kommentar columns to common_data table ([35c70](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/35c7060f17745b1) Lars Persson)  
+-  **deps**  update dependency se.fk.rimfrost.adapter.arbetsgivare:rimfrost-adapter-arbetsgivare to v1.1.7 ([be62a](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/be62a7f87c8c254) renovate[bot])  
+-  Cleanup replyTo leftovers ([6f288](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/6f28836b8d6f0e1) Lars Persson)  
+
+### Dependency updates
+
+- update dependency se.fk.rimfrost.framework.regel:rimfrost-framework-regel to v1.6.2 (#64) ([b4099](https://github.com/Forsakringskassan/rimfrost-regel-bekraftabeslut/commit/b40999dabf838ed) renovate[bot])  
 ## 1.2.0 (2026-11-09)
 
 ### Features
